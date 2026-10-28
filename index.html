@@ -1,0 +1,2845 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ТПА-Мастер | ООО «Дельфин Групп» — Интерактивная диагностика и регламент ремонта ТПА</title>
+    <!-- Исправленный встроенный SVG-фавикон (плиты смыкания + видимые колонны-стяжки) -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23EA580C'%3E%3Cpath d='M3 6h7v12H3zM14 6h7v12h-7zM10 9h4v2h-4zM10 13h4v2h-4z'/%3E%3C/svg%3E">
+    <meta name="description" content="ТПА-Мастер — интерактивная диагностика и регламент ремонта термопластавтоматов ООО «Дельфин Групп» (Санкт-Петербург, п. Металлострой): 8 типовых дефектов литья ПП, пошаговый алгоритм наладки, инструмент, допуски и сменный журнал мастера.">
+    <meta name="theme-color" content="#0F172A">
+    <meta name="robots" content="index, follow">
+    <!-- Разметка Open Graph -->
+    <meta property="og:title" content="ТПА-Мастер | ООО «Дельфин Групп» — Диагностика и ремонт ТПА">
+    <meta property="og:description" content="Интерактивная диагностика ТПА и сводный регламент ремонта: дефекты тонкостенного литья ПП, аппаратные сбои, допуски узлов и сменный журнал мастера.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:site_name" content="ООО «Дельфин Групп» — ТПА-Мастер">
+    <!-- Микроразметка Schema.org / JSON-LD для производственно-сервисного предприятия -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "IndustrialBusiness",
+      "name": "ООО «Дельфин Групп» — Сервисная служба ТПА и производство полипропиленовой тары",
+      "description": "Скоростное литьё тонкостенной полипропиленовой упаковки с IML-этикеткой, интерактивная диагностика, ремонт и ревизия термопластавтоматов (120–500 т) и горячеканальных пресс-форм.",
+      "email": "info@delgroup.su",
+      "telephone": [
+        "+7-812-464-87-12",
+        "+7-812-464-74-68"
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "postalCode": "196641",
+        "addressLocality": "г. Санкт-Петербург, п. Металлострой",
+        "streetAddress": "дорога на Металлострой, д. 5, лит. П",
+        "addressCountry": "RU"
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+          ],
+          "opens": "00:00",
+          "closes": "23:59"
+        }
+      ]
+    }
+    </script>
+    <!-- Подключение шрифтов Inter и JetBrains Mono для промышленного HMI-интерфейса -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        industrial: {
+                            950: '#090D16',
+                            900: '#0F172A',
+                            800: '#1E293B',
+                            700: '#334155',
+                            100: '#F1F5F9',
+                            50: '#F8FAFC',
+                        },
+                        signal: {
+                            orange: '#EA580C',
+                            blue: '#2563EB',
+                            red: '#DC2626',
+                            green: '#16A34A',
+                            amber: '#D97706'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Кастомные стили для промышленных элементов управления и табличных чисел */
+        body {
+            background-color: #F8FAFC;
+            color: #0F172A;
+            -webkit-tap-highlight-color: transparent;
+            font-variant-numeric: tabular-nums;
+        }
+        .hmi-grid-bg {
+            background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .hmi-dark-grid {
+            background-image: linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+        /* Крупный чекбокс для работы в цеху (в перчатках / на планшете) */
+        .hmi-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 1.75rem;
+            height: 1.75rem;
+            border: 2px solid #64748B;
+            border-radius: 0.375rem;
+            background-color: #FFFFFF;
+            display: inline-grid;
+            place-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+            flex-shrink: 0;
+        }
+        .hmi-checkbox::before {
+            content: "";
+            width: 0.95rem;
+            height: 0.95rem;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em #FFFFFF;
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        .hmi-checkbox:checked {
+            background-color: #EA580C;
+            border-color: #EA580C;
+        }
+        .hmi-checkbox:checked::before {
+            transform: scale(1);
+        }
+        .hmi-step-checkbox:checked {
+            background-color: #16A34A;
+            border-color: #16A34A;
+        }
+        /* Индикатор пульсации */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.85); opacity: 0.9; }
+            70% { transform: scale(1.9); opacity: 0; }
+            100% { transform: scale(1.9); opacity: 0; }
+        }
+        .pulse-dot::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 9999px;
+            background-color: currentColor;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        /* Видимый фокус для клавиатуры и работы в цеху (доступность) */
+        button:focus-visible, a:focus-visible, input:focus-visible,
+        select:focus-visible, textarea:focus-visible, .hmi-checkbox:focus-visible,
+        [role="button"]:focus-visible, [role="checkbox"]:focus-visible {
+            outline: 3px solid #2563EB;
+            outline-offset: 2px;
+            border-radius: 6px;
+        }
+        /* Якорные секции не прячутся под sticky-шапкой */
+        section[id] {
+            scroll-margin-top: 84px;
+        }
+        /* Печать регламента: скрываем все секции, кроме сводного регламента #solution */
+        @media print {
+            header,
+            nav,
+            #mobileMenu,
+            #top,
+            #diagnostics,
+            #units,
+            #shift-log,
+            #contacts,
+            #serviceModal,
+            #hmiToast,
+            #solutionActionToolbar,
+            .no-print {
+                display: none !important;
+            }
+            body, #solution {
+                background: #ffffff !important;
+                color: #0F172A !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                border: none !important;
+            }
+            .bg-signal-red, .bg-signal-orange, .bg-signal-green,
+            .bg-emerald-50, .bg-red-50, .bg-orange-50, .bg-amber-50,
+            .bg-emerald-500, .bg-industrial-900, .bg-industrial-800 {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            section {
+                break-inside: auto;
+            }
+            .rounded-xl, .rounded-lg, .rounded {
+                border-radius: 4px !important;
+            }
+            .shadow-sm, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl {
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-signal-orange selection:text-white">
+
+    <!-- 1. ФИКСИРОВАННАЯ ШАПКА (HEADER) -->
+    <header class="sticky top-0 z-40 bg-industrial-900 text-white border-b-2 border-industrial-700 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20 gap-3">
+                <!-- Логотип и название -->
+                <a href="#top" class="flex items-center gap-3 group focus:outline-none">
+                    <div class="w-11 h-11 rounded-lg bg-signal-orange flex items-center justify-center shadow-inner border border-orange-400/40 group-hover:bg-orange-500 transition">
+                        <!-- Иконка узла смыкания/шнека ТПА -->
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h6v10H4zM14 7h6v10h-6zM10 10h4M10 14h4M2 12h2M20 12h2"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold tracking-tight text-base sm:text-lg text-white">ТПА-Мастер</span>
+                            <span class="hidden sm:inline-block text-xs font-mono uppercase px-2 py-0.5 rounded bg-industrial-800 text-orange-400 border border-industrial-700">HMI v2.5</span>
+                        </div>
+                        <p class="text-xs text-slate-300 font-medium">ООО «Дельфин Групп» • Металлострой</p>
+                    </div>
+                </a>
+
+                <!-- Быстрые ссылки на разделы (Desktop) -->
+                <nav id="desktopNav" class="hidden lg:flex items-center gap-1 text-sm font-medium text-slate-200" aria-label="Основная навигация">
+                    <a href="#diagnostics" data-nav-link="diagnostics" class="nav-section-link px-3 py-2 rounded-md hover:bg-industrial-800 hover:text-white transition">Диагностика ТПА</a>
+                    <a href="#solution" data-nav-link="solution" class="nav-section-link px-3 py-2 rounded-md hover:bg-industrial-800 hover:text-white transition flex items-center gap-1.5">
+                        <span>Решение и инструкция</span>
+                        <span id="navSelectedBadge" class="font-mono text-xs px-1.5 py-0.5 rounded bg-signal-orange text-white font-bold">0</span>
+                    </a>
+                    <a href="#units" data-nav-link="units" class="nav-section-link px-3 py-2 rounded-md hover:bg-industrial-800 hover:text-white transition">База узлов и допусков</a>
+                    <a href="#shift-log" data-nav-link="shift-log" class="nav-section-link px-3 py-2 rounded-md hover:bg-industrial-800 hover:text-white transition">Журнал смены</a>
+                    <a href="#contacts" data-nav-link="contacts" class="nav-section-link px-3 py-2 rounded-md hover:bg-industrial-800 hover:text-white transition">Сервис и контакты</a>
+                </nav>
+
+                <!-- Динамический индикатор статуса цеха и кнопка вызова -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="hidden xl:flex items-center gap-2.5 bg-industrial-800/90 border border-industrial-700 px-3 py-1.5 rounded-lg">
+                        <span id="shopStatusDotWrap" class="relative flex h-2.5 w-2.5 text-emerald-400 pulse-dot">
+                            <span id="shopStatusDot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                        </span>
+                        <div class="text-xs leading-tight">
+                            <div class="text-slate-300 font-medium">Цех литья ПП / IML</div>
+                            <div id="shopStatusText" class="font-mono text-emerald-400 font-semibold">ЛИНИИ В РАБОТЕ • 24/7</div>
+                        </div>
+                    </div>
+
+                    <button type="button" data-action="open-modal" data-modal-type="Дежурный наладчик ТПА" class="inline-flex items-center gap-2 bg-signal-orange hover:bg-orange-700 active:bg-orange-800 text-white font-semibold text-xs sm:text-sm px-3.5 sm:px-4 py-2.5 rounded-lg shadow-md border border-orange-400/30 transition cursor-pointer">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                        </svg>
+                        <span>Вызвать дежурного наладчика</span>
+                    </button>
+
+                    <!-- Мобильное меню -->
+                    <button type="button" id="mobileMenuBtn" data-action="toggle-mobile-menu" class="lg:hidden p-2.5 min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg bg-industrial-800 text-slate-200 hover:text-white border border-industrial-700 cursor-pointer" aria-label="Меню разделов" aria-expanded="false" aria-controls="mobileMenu">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Мобильная навигация -->
+        <div id="mobileMenu" class="hidden lg:hidden bg-industrial-800 border-t border-industrial-700 px-4 pt-3 pb-4 space-y-2">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm font-medium">
+                <a href="#diagnostics" data-action="close-mobile-menu" class="px-3 py-2.5 rounded-lg bg-industrial-900/60 hover:bg-industrial-900 text-white flex items-center justify-between">
+                    <span>1. Диагностика ТПА</span>
+                    <span class="font-mono text-xs text-slate-400">ВЫБОР ЧЕКБОКСОВ</span>
+                </a>
+                <a href="#solution" data-action="close-mobile-menu" class="px-3 py-2.5 rounded-lg bg-industrial-900/60 hover:bg-industrial-900 text-white flex items-center justify-between">
+                    <span>2. Решение и инструкция</span>
+                    <span id="mobileNavBadge" class="font-mono text-xs px-2 py-0.5 rounded bg-signal-orange text-white">0</span>
+                </a>
+                <a href="#units" data-action="close-mobile-menu" class="px-3 py-2.5 rounded-lg bg-industrial-900/60 hover:bg-industrial-900 text-white flex items-center justify-between">
+                    <span>3. База узлов и допусков</span>
+                    <span class="font-mono text-xs text-slate-400">ПП 210–250°C</span>
+                </a>
+                <a href="#shift-log" data-action="close-mobile-menu" class="px-3 py-2.5 rounded-lg bg-industrial-900/60 hover:bg-industrial-900 text-white flex items-center justify-between">
+                    <span>4. Журнал смены</span>
+                    <span class="font-mono text-xs text-emerald-400">ЛОГ ЦЕХА</span>
+                </a>
+                <a href="#contacts" data-action="close-mobile-menu" class="sm:col-span-2 px-3 py-2.5 rounded-lg bg-industrial-900/60 hover:bg-industrial-900 text-white flex items-center justify-between">
+                    <span>5. Сервисная служба ООО «Дельфин Групп»</span>
+                    <span class="font-mono text-xs text-orange-400">+7 (812) 464-87-12</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. ГЛАВНЫЙ РАБОЧИЙ ЭКРАН (HERO / ПАНЕЛЬ БЫСТРОГО СТАРТА) -->
+    <section id="top" class="bg-industrial-900 text-white hmi-dark-grid border-b-4 border-signal-orange">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <!-- Левая колонка: Заголовок и быстрый старт -->
+                <div class="lg:col-span-7 space-y-5">
+                    <div class="inline-flex flex-wrap items-center gap-2 px-3 py-1 rounded-md bg-industrial-800 border border-industrial-700 text-xs font-mono text-orange-400">
+                        <span>ВНУТРЕННИЙ ИНЖЕНЕРНЫЙ ПОРТАЛ</span>
+                        <span>•</span>
+                        <span>САНКТ-ПЕТЕРБУРГ, П. МЕТАЛЛОСТРОЙ</span>
+                    </div>
+
+                    <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                        Интерактивная диагностика и регламент ремонта ТПА
+                    </h1>
+
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl">
+                        Оперативная система поддержки принятия решений для сменных мастеров, наладчиков ТПА и инженеров по ремонту <strong class="text-white">ООО «Дельфин Групп»</strong>. Отметьте галочками наблюдаемые дефекты тонкостенного литья полипропилена или аппаратные сбои станка — система мгновенно сформирует сводный пошаговый алгоритм устранения, список инструмента и карту допусков.
+                    </p>
+
+                    <!-- Кнопки быстрого перехода и выбора типа ТПА -->
+                    <div class="pt-2 flex flex-wrap items-center gap-3">
+                        <a href="#diagnostics" class="inline-flex items-center gap-2.5 bg-signal-orange hover:bg-orange-600 text-white font-bold px-5 py-3.5 rounded-lg shadow-lg transition text-sm sm:text-base">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>Перейти к выбору ошибок (8)</span>
+                        </a>
+                        <button type="button" data-action="load-preset" data-preset="thinwall" class="inline-flex items-center gap-2 bg-industrial-800 hover:bg-industrial-700 text-white border border-orange-500/40 font-semibold px-4 py-3.5 rounded-lg shadow transition text-sm cursor-pointer">
+                            <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            <span>Скоростной ТПА (Тонкостенная тара / IML)</span>
+                        </button>
+                        <button type="button" data-action="load-preset" data-preset="hydraulic" class="inline-flex items-center gap-2 bg-industrial-800 hover:bg-industrial-700 text-slate-100 border border-industrial-700 font-semibold px-4 py-3.5 rounded-lg transition text-sm cursor-pointer">
+                            <span>Гидравлический ТПА 120–500 т</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Правая колонка: Сводка по парку оборудования цеха -->
+                <div class="lg:col-span-5">
+                    <div class="bg-industrial-800/95 border-2 border-industrial-700 rounded-xl p-5 shadow-2xl space-y-4">
+                        <div class="flex items-center justify-between border-b border-industrial-700 pb-3">
+                            <div>
+                                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200">Парк оборудования и специфика цеха</h2>
+                                <p class="text-xs text-slate-400 font-mono">Более 20 лет производства полипропиленовой тары</p>
+                            </div>
+                            <span class="font-mono text-xs px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">ПП / PP-R / IML</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <!-- Карточка 1 -->
+                            <div data-action="select-machine-quick" data-machine="ТПА №01 — Скоростной 280т (IML-контейнер)" tabindex="0" role="button" class="p-3.5 rounded-lg bg-industrial-900/90 border border-industrial-700 hover:border-signal-orange transition cursor-pointer group">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-signal-orange shrink-0"></span>
+                                        <h3 class="font-bold text-sm text-white group-hover:text-orange-400 transition">Скоростные ТПА для тонкостенной тары</h3>
+                                    </div>
+                                    <span class="font-mono text-xs text-orange-400 bg-orange-950/60 px-2 py-0.5 rounded border border-orange-500/30">Цикл 3.2–5.8 с</span>
+                                </div>
+                                <p class="text-xs sm:text-sm text-slate-300 mt-1.5 leading-snug">
+                                    Литьё пресервных шайб, банок и контейнеров с IML-этикеткой. Гидроаккумуляторы впрыска (до 350–500 мм/с), многогнездные горячеканальные формы (4–16 гнезд).
+                                </p>
+                                <div class="mt-2 flex items-center justify-end text-xs font-mono text-orange-400 opacity-80 group-hover:opacity-100">
+                                    <span>Выбрать пост диагностики →</span>
+                                </div>
+                            </div>
+
+                            <!-- Карточка 2 -->
+                            <div data-action="select-machine-quick" data-machine="ТПА №04 — Гидравлический 320т (Тара ПП)" tabindex="0" role="button" class="p-3.5 rounded-lg bg-industrial-900/90 border border-industrial-700 hover:border-signal-blue transition cursor-pointer group">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-signal-blue shrink-0"></span>
+                                        <h3 class="font-bold text-sm text-white group-hover:text-blue-400 transition">Стандартные гидравлические ТПА 120–500 т</h3>
+                                    </div>
+                                    <span class="font-mono text-xs text-blue-300 bg-blue-950/60 px-2 py-0.5 rounded border border-blue-500/30">КРМ / Сервопривод</span>
+                                </div>
+                                <p class="text-xs sm:text-sm text-slate-300 mt-1.5 leading-snug">
+                                    Пятишарнирный коленно-рычажный механизм (КРМ), пропорциональная гидравлика давления и потока, выпуск крышек, вёдер и комплектующих из ПП.
+                                </p>
+                                <div class="mt-2 flex items-center justify-end text-xs font-mono text-blue-400 opacity-80 group-hover:opacity-100">
+                                    <span>Выбрать пост диагностики →</span>
+                                </div>
+                            </div>
+
+                            <!-- Карточка 3 -->
+                            <div data-action="select-machine-quick" data-machine="Участок ИУ — Ремонт и ревизия пресс-форм" tabindex="0" role="button" class="p-3.5 rounded-lg bg-industrial-900/90 border border-industrial-700 hover:border-emerald-400 transition cursor-pointer group">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></span>
+                                        <h3 class="font-bold text-sm text-white group-hover:text-emerald-400 transition">Инструментальный участок ремонта пресс-форм</h3>
+                                    </div>
+                                    <span class="font-mono text-xs text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">Допуск ±0.01 мм</span>
+                                </div>
+                                <p class="text-xs sm:text-sm text-slate-300 mt-1.5 leading-snug">
+                                    Восстановление запирающих поясков, притирка колонок и втулок, чистка выпаров (0.015–0.025 мм), промывка контуров охлаждения и замена ТЭНов ГКС.
+                                </p>
+                                <div class="mt-2 flex items-center justify-end text-xs font-mono text-emerald-400 opacity-80 group-hover:opacity-100">
+                                    <span>Выбрать участок ИУ →</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. РАЗДЕЛ «ИНТЕРАКТИВНЫЙ ВЫБОР ПРОБЛЕМ ТПА» (КЛЮЧЕВОЙ ФУНКЦИОНАЛЬНЫЙ БЛОК) -->
+    <section id="diagnostics" class="py-10 sm:py-14 hmi-grid-bg border-b border-slate-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+
+            <!-- Заголовок блока + Панель выбора станка и смены -->
+            <div class="bg-white border-2 border-slate-300 rounded-xl p-5 sm:p-6 shadow-sm">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded bg-industrial-900 text-white font-mono text-xs font-bold">ШАГ 1</span>
+                            <span class="text-xs font-mono uppercase text-slate-500 font-semibold">ОТМЕТЬТЕ ЧЕКБОКСАМИ ВСЕ НАБЛЮДАЕМЫЕ СИМПТОМЫ НА СТАНКЕ</span>
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-industrial-900 mt-1">
+                            Интерактивный выбор проблем ТПА и дефектов литья
+                        </h2>
+                    </div>
+
+                    <!-- Быстрые пресеты комбинированных аварий -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-mono text-slate-500 mr-1">Типовые комбинации:</span>
+                        <button type="button" data-action="load-preset" data-preset="shortshot_burn" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-orange-50 hover:text-signal-orange border border-slate-300 transition cursor-pointer">
+                            Недолив + Пригар (1+4)
+                        </button>
+                        <button type="button" data-action="load-preset" data-preset="flash_clamp" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-orange-50 hover:text-signal-orange border border-slate-300 transition cursor-pointer">
+                            Облой + Перекос плит (2+5)
+                        </button>
+                        <button type="button" data-action="load-preset" data-preset="screw_hyd" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-orange-50 hover:text-signal-orange border border-slate-300 transition cursor-pointer">
+                            Шнек + Перегрев масла (6+7)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Панель параметров поста диагностики: Станок, Смена, Поиск -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-5">
+                    <!-- Выбор ТПА -->
+                    <div class="md:col-span-4">
+                        <label for="machineSelect" class="block text-xs font-bold uppercase text-slate-600 mb-1.5 font-mono">Номер / Узел ТПА в цеху</label>
+                        <select id="machineSelect" class="w-full rounded-lg border-2 border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-semibold text-industrial-900 focus:border-signal-orange focus:bg-white focus:outline-none">
+                            <option value="ТПА №01 — Скоростной 280т (IML-контейнер)">ТПА №01 — Скоростной 280т (IML-контейнер)</option>
+                            <option value="ТПА №02 — Скоростной 220т (Пресервная шайба)">ТПА №02 — Скоростной 220т (Пресервная шайба)</option>
+                            <option value="ТПА №03 — Скоростной 350т (Тонкостенная банка ПП)">ТПА №03 — Скоростной 350т (Тонкостенная банка ПП)</option>
+                            <option value="ТПА №04 — Гидравлический 320т (Тара ПП)">ТПА №04 — Гидравлический 320т (Тара ПП)</option>
+                            <option value="ТПА №05 — Гидравлический 160т (Крышка тонкостенная)">ТПА №05 — Гидравлический 160т (Крышка тонкостенная)</option>
+                            <option value="ТПА №06 — Гидравлический 500т (Крупногабаритная тара)">ТПА №06 — Гидравлический 500т (Крупногабаритная тара)</option>
+                            <option value="Участок ИУ — Ремонт и ревизия пресс-форм">Участок ИУ — Ремонт и ревизия пресс-форм</option>
+                        </select>
+                    </div>
+
+                    <!-- Выбор смены и мастера -->
+                    <div class="md:col-span-3">
+                        <label for="shiftSelect" class="block text-xs font-bold uppercase text-slate-600 mb-1.5 font-mono">Дежурная смена / Бригада</label>
+                        <select id="shiftSelect" class="w-full rounded-lg border-2 border-slate-300 bg-slate-50 px-3.5 py-2.5 text-sm font-semibold text-industrial-900 focus:border-signal-orange focus:bg-white focus:outline-none">
+                            <option value="Смена А (Дневная 08:00–20:00)">Смена А (Дневная 08:00–20:00)</option>
+                            <option value="Смена Б (Ночная 20:00–08:00)">Смена Б (Ночная 20:00–08:00)</option>
+                            <option value="Смена В (Дежурный наладчик)">Смена В (Дежурный наладчик)</option>
+                            <option value="Сервисная служба ГИ">Сервисная служба Главного Инженера</option>
+                        </select>
+                    </div>
+
+                    <!-- Быстрый поиск по симптому или коду -->
+                    <div class="md:col-span-5">
+                        <label for="symptomSearch" class="block text-xs font-bold uppercase text-slate-600 mb-1.5 font-mono">Быстрый поиск по симптому, узлу или коду</label>
+                        <div class="relative">
+                            <input id="symptomSearch" type="text" placeholder="Напр.: недолив, облой, торпеда, 55 °C, КРМ, ТХК, толкатели..." class="w-full rounded-lg border-2 border-slate-300 bg-slate-50 pl-10 pr-10 py-2.5 text-sm text-industrial-900 placeholder:text-slate-400 focus:border-signal-blue focus:bg-white focus:outline-none">
+                            <svg class="w-5 h-5 text-slate-400 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <button type="button" id="clearSearchBtn" data-action="clear-search" class="hidden absolute right-1.5 top-1.5 w-8 h-8 inline-flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 cursor-pointer" title="Очистить поиск" aria-label="Очистить поиск">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Переключение вкладок категорий + счетчик выбранных -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-5 mt-5 border-t border-slate-200">
+                    <div class="flex flex-wrap gap-2" role="tablist" aria-label="Категории неисправностей ТПА">
+                        <button type="button" data-action="filter-category" data-category="all" id="tab-all" role="tab" aria-selected="true" aria-controls="problemsGrid" class="category-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold bg-industrial-900 text-white shadow-sm transition cursor-pointer">
+                            Все проблемы (8)
+                        </button>
+                        <button type="button" data-action="filter-category" data-category="classic" id="tab-classic" role="tab" aria-selected="false" aria-controls="problemsGrid" class="category-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 transition cursor-pointer">
+                            Классические ошибки литья и ТПА (4)
+                        </button>
+                        <button type="button" data-action="filter-category" data-category="hardware" id="tab-hardware" role="tab" aria-selected="false" aria-controls="problemsGrid" class="category-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 transition cursor-pointer">
+                            Нетипичные и аппаратные сбои (4)
+                        </button>
+                        <button type="button" data-action="filter-category" data-category="mold" id="tab-mold" role="tab" aria-selected="false" aria-controls="problemsGrid" class="category-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 transition cursor-pointer">
+                            Пресс-формы и охлаждение
+                        </button>
+                    </div>
+
+                    <div class="flex items-center justify-between sm:justify-end gap-3 bg-slate-100 px-3.5 py-2 rounded-lg border border-slate-300">
+                        <div class="text-xs font-mono">
+                            <span class="text-slate-600">Выбрано проблем:</span>
+                            <strong id="selectedCountText" class="text-industrial-900 text-sm ml-1">0 из 8</strong>
+                        </div>
+                        <button type="button" data-action="reset-selections" class="text-xs font-semibold text-slate-600 hover:text-signal-red underline cursor-pointer">
+                            Сбросить все
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Сетка 8 детальных карточек проблем с крупными чекбоксами -->
+            <div id="problemsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                <!-- Карточки рендерятся динамически из JS -->
+            </div>
+
+            <!-- Быстрая плашка перехода к решению (становится sticky при активном выборе) -->
+            <div id="floatingActionSummary" class="bg-industrial-900 text-white rounded-xl p-4 sm:p-5 border-2 border-signal-orange shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-lg bg-signal-orange/20 border border-signal-orange flex items-center justify-center text-orange-400 font-mono font-bold text-lg shrink-0" id="summaryBadgeCount">
+                        0
+                    </div>
+                    <div>
+                        <h3 id="summaryBannerTitle" class="font-bold text-base sm:text-lg text-white">Отметьте одну или несколько карточек выше</h3>
+                        <p id="summaryBannerSub" class="text-xs sm:text-sm text-slate-300">Сводная пошаговая инструкция по наладке и ремонту перестраивается автоматически в реальном времени.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2.5 w-full sm:w-auto">
+                    <a href="#solution" class="w-full sm:w-auto text-center bg-signal-orange hover:bg-orange-600 text-white font-bold text-sm px-5 py-3 rounded-lg shadow transition">
+                        Смотреть сводный регламент ↓
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. РАЗДЕЛ «ПОЛНОЕ РЕШЕНИЕ И ПОШАГОВАЯ ИНСТРУКЦИЯ ПО РЕМОНТУ» (ДИНАМИЧЕСКИЙ БЛОК) -->
+    <section id="solution" class="py-10 sm:py-14 bg-white border-b-2 border-slate-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+
+            <!-- Шапка динамического блока и панель кнопок действий -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-industrial-900 text-white p-5 sm:p-6 rounded-xl border-l-8 border-signal-orange shadow-md">
+                <div>
+                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                        <span class="px-2.5 py-0.5 rounded bg-signal-orange text-white font-mono text-xs font-bold">ШАГ 2 • ДИНАМИЧЕСКИЙ РЕГЛАМЕНТ</span>
+                        <span id="solutionMachineTag" class="px-2.5 py-0.5 rounded bg-industrial-800 text-slate-200 font-mono text-xs border border-industrial-700">ТПА №01 — Скоростной 280т</span>
+                        <span id="solutionCriticalityBadge" class="px-2.5 py-0.5 rounded bg-slate-700 text-slate-200 font-mono text-xs font-bold uppercase">ОЖИДАНИЕ ВЫБОРА</span>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight">
+                        Полное решение и пошаговая инструкция по ремонту
+                    </h2>
+                    <p id="solutionSubtitle" class="text-xs sm:text-sm text-slate-300 mt-1">
+                        Выберите хотя бы одну проблему в блоке диагностики или нажмите «Выбрать типовой кейс» для демонстрации.
+                    </p>
+                </div>
+
+                <!-- Кнопки управления решением -->
+                <div id="solutionActionToolbar" class="flex flex-wrap items-center gap-2.5">
+                    <button type="button" id="btnPresetCase" data-action="load-preset" data-preset="thinwall" class="px-3.5 py-2.5 rounded-lg bg-industrial-800 hover:bg-industrial-700 text-slate-100 border border-industrial-700 text-xs sm:text-sm font-semibold transition cursor-pointer">
+                        Выбрать типовой кейс
+                    </button>
+                    <button type="button" id="btnResetSelection" data-action="reset-selections" class="px-3.5 py-2.5 rounded-lg bg-industrial-800 hover:bg-red-950/80 hover:text-red-300 hover:border-red-700 text-slate-200 border border-industrial-700 text-xs sm:text-sm font-semibold transition cursor-pointer">
+                        Сбросить выбор
+                    </button>
+                    <button type="button" id="btnCopyInstruction" data-action="copy-instruction" class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg bg-signal-blue hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow transition cursor-pointer disabled:opacity-40 disabled:pointer-events-none">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        <span>Скопировать инструкцию</span>
+                    </button>
+                    <button type="button" id="btnPrintInstruction" data-action="print-instruction" class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg bg-industrial-800 hover:bg-industrial-700 text-white text-xs sm:text-sm font-semibold border border-industrial-700 transition cursor-pointer disabled:opacity-40 disabled:pointer-events-none" title="Печать или сохранение регламента в PDF">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-12 4h12a2 2 0 002-2v-5H4v5a2 2 0 002 2z"/>
+                        </svg>
+                        <span>Печать / PDF</span>
+                    </button>
+                    <button type="button" id="btnSaveToLog" data-action="save-to-log" class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-signal-orange hover:bg-orange-600 text-white text-xs sm:text-sm font-bold shadow-md transition cursor-pointer disabled:opacity-40 disabled:pointer-events-none">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <span>Сохранить ремонт в журнал смены</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Контейнер динамического контента решения -->
+            <div id="solutionDynamicContainer">
+                <!-- Заполняется автоматически через renderSolutionPanel() -->
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 5. РАЗДЕЛ «СПРАВОЧНИК УЗЛОВ ТПА И РЕГЛАМЕНТ ТО ООО ДЕЛЬФИН ГРУПП» -->
+    <section id="units" class="py-10 sm:py-14 bg-industrial-100 border-b-2 border-slate-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <span class="font-mono text-xs font-bold uppercase px-2.5 py-1 rounded bg-industrial-900 text-orange-400">БАЗА ЗНАНИЙ НАЛАДЧИКА И МЕХАНИКА</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-industrial-900 mt-2">
+                        Справочник узлов ТПА и регламент ТО ООО «Дельфин Групп»
+                    </h2>
+                    <p class="text-sm text-slate-600 mt-1">
+                        Паспортные зазоры, температурные профили расплава полипропилена (ПП 210–250 °C), рабочие давления и контрольный чек-лист ежесменного осмотра.
+                    </p>
+                </div>
+                <div class="font-mono text-xs bg-white px-4 py-2.5 rounded-lg border-2 border-slate-300 text-industrial-900 shadow-sm">
+                    Сырьё: <strong>PP Homopolymer / Random Copolymer (ПТР 35–70 г/10 мин)</strong>
+                </div>
+            </div>
+
+            <!-- 4 карточки ключевых узлов ТПА -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <!-- Узел 1: Узел впрыска и пластикации -->
+                <div class="bg-white rounded-xl border-2 border-slate-300 shadow-sm overflow-hidden flex flex-col justify-between">
+                    <div class="p-5 sm:p-6 space-y-4">
+                        <div class="flex items-start justify-between gap-3 border-b border-slate-200 pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-lg bg-orange-100 border border-orange-300 text-signal-orange flex items-center justify-center shrink-0">
+                                    <!-- SVG Шнек и цилиндр -->
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h14l4 2-4 2H3v-4zM6 10l2 4M10 10l2 4M14 10l2 4"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="font-mono text-xs font-bold text-signal-orange uppercase">УЗЕЛ №1 • ПЛАСТИКАЦИЯ</span>
+                                    <h3 class="text-lg font-extrabold text-industrial-900">Узел впрыска и пластикации</h3>
+                                </div>
+                            </div>
+                            <span class="font-mono text-xs font-bold px-2.5 py-1 rounded bg-slate-100 border border-slate-300 text-industrial-900">210–250 °C</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2.5 text-xs sm:text-sm font-mono">
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Профиль зон ПП (1→Сопло):</div>
+                                <div class="font-bold text-industrial-900 mt-0.5">210 / 225 / 235 / 245 / 240 °C</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Зазор кольцо (торпеда):</div>
+                                <div class="font-bold text-industrial-900 mt-0.5">0.03 – 0.06 мм (max 0.12)</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Подушка расплава:</div>
+                                <div class="font-bold text-industrial-900 mt-0.5">3.0 – 6.0 мм (стабильная)</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Подпор при наборе дозы:</div>
+                                <div class="font-bold text-industrial-900 mt-0.5">8 – 18 бар (гидравл.)</div>
+                            </div>
+                        </div>
+
+                        <p class="text-sm text-slate-700 leading-snug">
+                            <strong>Регламент ТО:</strong> Проверка затяжки хомутовых ТЭНов и целостности кабелей термопар ТХК (тип J/K) каждую неделю. Контроль обратного клапана (торпеды) на обратную утечку расплава при падении подушки до 0 мм.
+                        </p>
+                    </div>
+                    <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between text-xs font-mono text-slate-600">
+                        <span>Осмотр: Каждую смену (12 ч)</span>
+                        <button type="button" data-action="select-from-unit" data-problem-id="6" class="text-signal-blue font-bold hover:underline cursor-pointer">Диагностировать шнек →</button>
+                    </div>
+                </div>
+
+                <!-- Узел 2: Узел смыкания и КРМ -->
+                <div class="bg-white rounded-xl border-2 border-slate-300 shadow-sm overflow-hidden flex flex-col justify-between">
+                    <div class="p-5 sm:p-6 space-y-4">
+                        <div class="flex items-start justify-between gap-3 border-b border-slate-200 pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-lg bg-blue-100 border border-blue-300 text-signal-blue flex items-center justify-center shrink-0">
+                                    <!-- SVG КРМ и плиты -->
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 5v14M20 5v14M10 6v12M4 8h16M4 16h16M4 12l3-3 3 3-3 3-3-3z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="font-mono text-xs font-bold text-signal-blue uppercase">УЗЕЛ №2 • МЕХАНИКА СМЫКАНИЯ</span>
+                                    <h3 class="text-lg font-extrabold text-industrial-900">Узел смыкания и КРМ (120–500 т)</h3>
+                                </div>
+                            </div>
+                            <span class="font-mono text-xs font-bold px-2.5 py-1 rounded bg-slate-100 border border-slate-300 text-industrial-900">≤ 0.05 мм/м</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2.5 text-xs sm:text-sm font-mono">
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Параллельность плит:</div>
+                                <div class="font-bold text-industrial-900 mt-0.5">≤ 0.04 – 0.06 мм на 1000 мм</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Зазор палец–втулка КРМ:</div>
+                                <div class="font-bold text-industrial-900 mt-0.5">0.04 – 0.08 мм (предел 0.18)</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Защита формы (НД):</div>
+                                <div class="font-bold text-industrial-900 mt-0.5">15 – 28 бар / таймер ≤ 1.2 с</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Центр. смазка КРМ:</div>
+                                <div class="font-bold text-industrial-900 mt-0.5">NLGI 00/000 каждые 2500 цикл.</div>
+                            </div>
+                        </div>
+
+                        <p class="text-sm text-slate-700 leading-snug">
+                            <strong>Регламент ТО:</strong> Ежесменный контроль давления в станции централизованной смазки КРМ и наличия масляной плёнки на всех 4 колоннах. Проверка натяжения гаек колонн тензодатчиком раз в 6 месяцев.
+                        </p>
+                    </div>
+                    <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between text-xs font-mono text-slate-600">
+                        <span>Осмотр: Каждую смену (12 ч)</span>
+                        <button type="button" data-action="select-from-unit" data-problem-id="5" class="text-signal-blue font-bold hover:underline cursor-pointer">Диагностировать КРМ →</button>
+                    </div>
+                </div>
+
+                <!-- Узел 3: Гидростанция и охлаждение -->
+                <div class="bg-white rounded-xl border-2 border-slate-300 shadow-sm overflow-hidden flex flex-col justify-between">
+                    <div class="p-5 sm:p-6 space-y-4">
+                        <div class="flex items-start justify-between gap-3 border-b border-slate-200 pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-lg bg-red-100 border border-red-300 text-signal-red flex items-center justify-center shrink-0">
+                                    <!-- SVG Гидравлика / Манометр -->
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="font-mono text-xs font-bold text-signal-red uppercase">УЗЕЛ №3 • ГИДРОПРИВОД</span>
+                                    <h3 class="text-lg font-extrabold text-industrial-900">Гидростанция, аккумуляторы и охлаждение</h3>
+                                </div>
+                            </div>
+                            <span class="font-mono text-xs font-bold px-2.5 py-1 rounded bg-slate-100 border border-slate-300 text-industrial-900">Масло 40–50 °C</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2.5 text-xs sm:text-sm font-mono">
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Температура масла (Авария):</div>
+                                <div class="font-bold text-signal-red mt-0.5">Норма 42–48 °C (MAX 55 °C)</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Системное давление:</div>
+                                <div class="font-bold text-industrial-900 mt-0.5">140 – 175 бар (пик 210 бар)</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Азот в гидроаккумуляторе:</div>
+                                <div class="font-bold text-industrial-900 mt-0.5">90 – 110 бар (проверка 1 р/мес)</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Тонкость фильтрации HLP-46:</div>
+                                <div class="font-bold text-industrial-900 mt-0.5">10 мкм (сервоклапаны 5 мкм)</div>
+                            </div>
+                        </div>
+
+                        <p class="text-sm text-slate-700 leading-snug">
+                            <strong>Регламент ТО:</strong> При превышении температуры масла > 55 °C снижается вязкость, начинаются утечки и залипание золотников пропорциональных клапанов PQ. Обязательна промывка трубчатого теплообменника от накипи.
+                        </p>
+                    </div>
+                    <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between text-xs font-mono text-slate-600">
+                        <span>Осмотр: Каждые 4 часа по термометру</span>
+                        <button type="button" data-action="select-from-unit" data-problem-id="7" class="text-signal-blue font-bold hover:underline cursor-pointer">Диагностировать гидросистему →</button>
+                    </div>
+                </div>
+
+                <!-- Узел 4: Пресс-форма и горячий канал -->
+                <div class="bg-white rounded-xl border-2 border-slate-300 shadow-sm overflow-hidden flex flex-col justify-between">
+                    <div class="p-5 sm:p-6 space-y-4">
+                        <div class="flex items-start justify-between gap-3 border-b border-slate-200 pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-lg bg-emerald-100 border border-emerald-300 text-signal-green flex items-center justify-center shrink-0">
+                                    <!-- SVG Пресс-форма -->
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="font-mono text-xs font-bold text-signal-green uppercase">УЗЕЛ №4 • ОСНАСТКА И ГКС</span>
+                                    <h3 class="text-lg font-extrabold text-industrial-900">Пресс-форма, ГКС и контур чиллера</h3>
+                                </div>
+                            </div>
+                            <span class="font-mono text-xs font-bold px-2.5 py-1 rounded bg-slate-100 border border-slate-300 text-industrial-900">Чиллер 10–14 °C</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2.5 text-xs sm:text-sm font-mono">
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Глубина выпаров под ПП:</div>
+                                <div class="font-bold text-industrial-900 mt-0.5">0.015 – 0.025 мм (поясок 3 мм)</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Перепад воды ΔT (Вход/Вых):</div>
+                                <div class="font-bold text-industrial-900 mt-0.5">≤ 2.5 – 3.0 °C (P = 3.5–5 бар)</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Разброс температур ГКС:</div>
+                                <div class="font-bold text-industrial-900 mt-0.5">± 2.0 °C между гнездами</div>
+                            </div>
+                            <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+                                <div class="text-slate-500 text-xs">Сопротивление изоляции ТЭН:</div>
+                                <div class="font-bold text-industrial-900 mt-0.5">≥ 5 МОм (на холодную)</div>
+                            </div>
+                        </div>
+
+                        <p class="text-sm text-slate-700 leading-snug">
+                            <strong>Регламент ТО:</strong> Очистка газоотводных каналов (выпаров) и запирающих поясков от нагара каждые 4–6 часов при скоростном литье. Контроль ротаметров охлаждения матриц и пуансонов.
+                        </p>
+                    </div>
+                    <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between text-xs font-mono text-slate-600">
+                        <span>Чистка выпаров: Каждые 15 000 циклов</span>
+                        <button type="button" data-action="select-from-unit" data-problem-id="8" class="text-signal-blue font-bold hover:underline cursor-pointer">Диагностировать пресс-форму →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Интерактивный график ежесменного осмотра мастера (автосохранение в localStorage) -->
+            <div id="daily-checklist-card" class="bg-white rounded-xl border-2 border-slate-300 p-5 sm:p-6 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-200">
+                    <div>
+                        <h3 class="text-base sm:text-lg font-extrabold text-industrial-900">Чек-лист приёмки смены наладчиком ТПА (Ежесменный регламент)</h3>
+                        <p class="text-xs sm:text-sm text-slate-500">Отметьте выполненные контрольные точки при заступлении на смену в цеху ООО «Дельфин Групп» (сохраняется автоматически)</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="dailyChecklistProgress" class="font-mono text-xs font-bold px-3 py-1 rounded bg-industrial-900 text-white">Выполнено: 0 / 6</span>
+                        <button type="button" data-action="reset-daily-checklist" class="text-xs font-mono text-slate-500 hover:text-signal-red underline cursor-pointer">Сбросить</button>
+                    </div>
+                </div>
+                <div id="dailyChecklistContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-4">
+                    <label class="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
+                        <input type="checkbox" data-daily-index="0" class="daily-check hmi-checkbox hmi-step-checkbox mt-0.5">
+                        <span class="text-xs sm:text-sm font-medium text-industrial-900 leading-snug">1. Проверить уровень и температуру масла в гидробаке (40–50 °C), отсутствие подтёков на РВД.</span>
+                    </label>
+                    <label class="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
+                        <input type="checkbox" data-daily-index="1" class="daily-check hmi-checkbox hmi-step-checkbox mt-0.5">
+                        <span class="text-xs sm:text-sm font-medium text-industrial-900 leading-snug">2. Проверить работу концевиков защитных ограждений оператора и гидромеханической блокировки.</span>
+                    </label>
+                    <label class="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
+                        <input type="checkbox" data-daily-index="2" class="daily-check hmi-checkbox hmi-step-checkbox mt-0.5">
+                        <span class="text-xs sm:text-sm font-medium text-industrial-900 leading-snug">3. Осмотреть плоскость разъёма пресс-формы, протереть выпары и проверить смазку колонок/толкателей.</span>
+                    </label>
+                    <label class="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
+                        <input type="checkbox" data-daily-index="3" class="daily-check hmi-checkbox hmi-step-checkbox mt-0.5">
+                        <span class="text-xs sm:text-sm font-medium text-industrial-900 leading-snug">4. Сверить проток воды на ротаметрах коллектора охлаждения и температуру чиллера (10–14 °C).</span>
+                    </label>
+                    <label class="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
+                        <input type="checkbox" data-daily-index="4" class="daily-check hmi-checkbox hmi-step-checkbox mt-0.5">
+                        <span class="text-xs sm:text-sm font-medium text-industrial-900 leading-snug">5. Проверить стабильность подушки расплава ПП (3–6 мм) и отсутствие течи из-под сопла цилиндра.</span>
+                    </label>
+                    <label class="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
+                        <input type="checkbox" data-daily-index="5" class="daily-check hmi-checkbox hmi-step-checkbox mt-0.5">
+                        <span class="text-xs sm:text-sm font-medium text-industrial-900 leading-snug">6. Проверить давление бачка центральной смазки КРМ и давление сжатого воздуха пневмосдува (6–8 бар).</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. РАЗДЕЛ «СМЕННЫЙ ЖУРНАЛ МАСТЕРА» (LOCALSTORAGE) -->
+    <section id="shift-log" class="py-10 sm:py-14 bg-white border-b-2 border-slate-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="font-mono text-xs font-bold uppercase px-2.5 py-0.5 rounded bg-industrial-900 text-emerald-400">ОПЕРАТИВНЫЙ УЧЁТ ЦЕХА</span>
+                        <span class="font-mono text-xs text-slate-500">Автосохранение в браузере (localStorage)</span>
+                        <a href="#daily-checklist-card" class="font-mono text-xs text-signal-blue hover:underline">↑ К чек-листу приёмки смены</a>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-industrial-900 mt-1">
+                        Сменный журнал мастера и история ремонтов ТПА
+                    </h2>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <button type="button" data-action="save-to-log" class="inline-flex items-center gap-1.5 bg-signal-orange hover:bg-orange-600 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-lg shadow transition cursor-pointer">
+                        <span>+ Записать текущий выбор в журнал</span>
+                    </button>
+                    <button type="button" data-action="reset-demo-logs" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs sm:text-sm font-semibold px-3.5 py-2.5 rounded-lg transition cursor-pointer">
+                        Восстановить демо-записи
+                    </button>
+                </div>
+            </div>
+
+            <!-- Таблица-лог последних диагностированных проблем -->
+            <div class="bg-white border-2 border-slate-300 rounded-xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-industrial-900 text-white font-mono text-xs uppercase">
+                                <th class="py-3.5 px-4 border-b border-industrial-700">Время / Смена</th>
+                                <th class="py-3.5 px-4 border-b border-industrial-700 hidden md:table-cell">Станок ТПА / Участок</th>
+                                <th class="py-3.5 px-4 border-b border-industrial-700">Диагностированные проблемы</th>
+                                <th class="py-3.5 px-4 border-b border-industrial-700 hidden lg:table-cell">Прогресс шагов</th>
+                                <th class="py-3.5 px-4 border-b border-industrial-700">Статус устранения</th>
+                                <th class="py-3.5 px-4 border-b border-industrial-700 text-right">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shiftLogTableBody" class="divide-y divide-slate-200 text-xs sm:text-sm">
+                            <!-- Строки рендерятся динамически из localStorage -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. РАЗДЕЛ «СЕРВИСНАЯ СЛУЖБА И КОНТАКТЫ» + FOOTER -->
+    <section id="contacts" class="py-10 sm:py-14 bg-industrial-900 text-white hmi-dark-grid border-t-4 border-signal-orange">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Реквизиты производственной площадки ООО «Дельфин Групп» -->
+                <div class="lg:col-span-7 space-y-5">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-industrial-800 border border-industrial-700 text-orange-400 font-mono text-xs">
+                        <span>ПРОИЗВОДСТВЕННО-СЕРВИСНАЯ БАЗА</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white">
+                        Сервисная служба и инструментальный участок ООО «Дельфин Групп»
+                    </h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        Предприятие более 20 лет специализируется на скоростном литье тонкостенной полипропиленовой упаковки (банки, пресервные шайбы, контейнеры с вплавляемой IML-этикеткой), а также выполняет комплексный ремонт, дефектовку и модернизацию термопластавтоматов и пресс-форм.
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                        <div class="bg-industrial-800/90 border border-industrial-700 p-4 rounded-xl">
+                            <div class="text-xs font-mono uppercase text-slate-400">Адрес производства и сервиса</div>
+                            <div class="font-bold text-sm sm:text-base text-white mt-1">
+                                196641, г. Санкт-Петербург, п. Металлострой, дорога на Металлострой, д. 5, лит. П
+                            </div>
+                        </div>
+
+                        <div class="bg-industrial-800/90 border border-industrial-700 p-4 rounded-xl">
+                            <div class="text-xs font-mono uppercase text-slate-400">Телефоны диспетчерской и сервиса</div>
+                            <div class="font-mono font-bold text-sm sm:text-base text-orange-400 mt-1 space-y-0.5">
+                                <div><a href="tel:+78124648712" class="hover:underline">+7 (812) 464-87-12</a></div>
+                                <div><a href="tel:+78124647468" class="hover:underline">+7 (812) 464-74-68</a></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-industrial-800/90 border border-industrial-700 p-4 rounded-xl">
+                            <div class="text-xs font-mono uppercase text-slate-400">Электронная почта (Отдел сервиса и ПДО)</div>
+                            <div class="font-mono font-bold text-sm sm:text-base text-blue-400 mt-1">
+                                <a href="mailto:info@delgroup.su" class="hover:underline">info@delgroup.su</a>
+                            </div>
+                            <div class="text-xs text-slate-400 mt-1">Приём чертежей пресс-форм и заявок на ЗИП</div>
+                        </div>
+
+                        <div class="bg-industrial-800/90 border border-industrial-700 p-4 rounded-xl">
+                            <div class="text-xs font-mono uppercase text-slate-400">Режим работы подразделений</div>
+                            <div class="font-bold text-sm text-white mt-1">
+                                Цех литья и дежурные наладчики: <span class="text-emerald-400 font-mono">24/7</span>
+                            </div>
+                            <div class="text-xs text-slate-300 mt-1">
+                                Инструментальный участок и офис: Пн–Пт 08:30–18:00
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Панель быстрого оформления сервисной заявки -->
+                <div class="lg:col-span-5">
+                    <div class="bg-industrial-800 border-2 border-industrial-700 rounded-xl p-5 sm:p-6 shadow-2xl space-y-4">
+                        <div class="flex items-center justify-between border-b border-industrial-700 pb-3">
+                            <div>
+                                <h3 class="text-base sm:text-lg font-extrabold text-white">Вызов сервисной бригады / Заявка</h3>
+                                <p class="text-xs text-slate-400">Передача карточки неисправности главному механику или в ИУ</p>
+                            </div>
+                            <span class="font-mono text-xs px-2 py-1 rounded bg-signal-orange text-white font-bold">СРОЧНО</span>
+                        </div>
+
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Если неисправность не устраняется силами сменного наладчика в течение 30 минут (требуется шлифовка запирающих кромок пресс-формы, замена шнековой пары, ремонт пропорционального клапана или ревизия КРМ), оформите наряд-заявку:
+                        </p>
+
+                        <div class="space-y-2.5 pt-1">
+                            <button type="button" data-action="open-modal" data-modal-type="Вызов дежурного наладчика ТПА к станку" class="w-full py-3 px-4 rounded-lg bg-signal-orange hover:bg-orange-600 text-white font-bold text-sm shadow flex items-center justify-between transition cursor-pointer">
+                                <span>1. Вызвать дежурного наладчика ТПА к станку</span>
+                                <span class="font-mono text-xs">→</span>
+                            </button>
+                            <button type="button" data-action="open-modal" data-modal-type="Заявка на реставрацию / ремонт пресс-формы" class="w-full py-3 px-4 rounded-lg bg-signal-blue hover:bg-blue-700 text-white font-bold text-sm shadow flex items-center justify-between transition cursor-pointer">
+                                <span>2. Заявка на ремонт и притирку пресс-формы</span>
+                                <span class="font-mono text-xs">→</span>
+                            </button>
+                            <button type="button" data-action="open-modal" data-modal-type="Аварийный вызов слесаря-гидравлика / КИПиА" class="w-full py-3 px-4 rounded-lg bg-industrial-900 hover:bg-industrial-950 text-slate-200 border border-industrial-700 font-semibold text-sm flex items-center justify-between transition cursor-pointer">
+                                <span>3. Вызов инженера КИПиА / гидравлика</span>
+                                <span class="font-mono text-xs">→</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Нижний колонтитул (Footer) -->
+            <footer class="pt-8 border-t border-industrial-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+                <div>
+                    © ООО «Дельфин Групп» (г. Санкт-Петербург, п. Металлострой, дорога на Металлострой, д. 5, лит. П). Внутренняя инженерно-диагностическая система «ТПА-Мастер».
+                </div>
+                <div class="font-mono flex items-center gap-4">
+                    <span>ТЕЛ: +7 (812) 464-87-12</span>
+                    <span>•</span>
+                    <span>INFO@DELGROUP.SU</span>
+                </div>
+            </footer>
+        </div>
+    </section>
+
+    <!-- МОДАЛЬНОЕ ОКНО БЫСТРОЙ ЗАЯВКИ НА ВЫЗОВ НАЛАДЧИКА / РЕМОНТ ТПА И ПРЕСС-ФОРМЫ -->
+    <div id="serviceModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white border-2 border-industrial-800 rounded-xl max-w-lg w-full overflow-hidden shadow-2xl">
+            <div class="bg-industrial-900 text-white px-5 py-4 flex items-center justify-between border-b-2 border-signal-orange">
+                <div>
+                    <span class="font-mono text-xs text-orange-400 uppercase font-bold">ДИСПЕТЧЕРСКАЯ СЛУЖБА ЦЕХА</span>
+                    <h3 id="modalTitle" class="text-lg font-extrabold">Вызов дежурного наладчика ТПА</h3>
+                </div>
+                <button type="button" data-action="close-modal" class="p-2 min-w-[40px] min-h-[40px] inline-flex items-center justify-center rounded-lg bg-industrial-800 text-slate-300 hover:text-white cursor-pointer" aria-label="Закрыть окно">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="serviceRequestForm" class="p-5 sm:p-6 space-y-4">
+                <div>
+                    <label for="modalRequestType" class="block text-xs font-mono font-bold uppercase text-slate-600 mb-1">Тип обращения</label>
+                    <input id="modalRequestType" type="text" readonly class="w-full rounded-lg border-2 border-slate-300 bg-slate-100 px-3.5 py-2 text-sm font-bold text-industrial-900">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label for="modalMachineInput" class="block text-xs font-mono font-bold uppercase text-slate-600 mb-1">Номер станка / Участок</label>
+                        <input id="modalMachineInput" type="text" required class="w-full rounded-lg border-2 border-slate-300 bg-white px-3.5 py-2 text-sm font-semibold text-industrial-900 focus:border-signal-orange focus:outline-none">
+                    </div>
+                    <div>
+                        <label for="modalMasterName" class="block text-xs font-mono font-bold uppercase text-slate-600 mb-1">ФИО / Табельный № мастера</label>
+                        <input id="modalMasterName" type="text" required placeholder="Напр.: Соколов А.В. (Смена А)" class="w-full rounded-lg border-2 border-slate-300 bg-white px-3.5 py-2 text-sm font-semibold text-industrial-900 focus:border-signal-orange focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="modalSymptomsText" class="block text-xs font-mono font-bold uppercase text-slate-600 mb-1">Отмеченные дефекты и комментарий</label>
+                    <textarea id="modalSymptomsText" rows="3" required class="w-full rounded-lg border-2 border-slate-300 bg-white p-3 text-sm text-industrial-900 focus:border-signal-orange focus:outline-none"></textarea>
+                </div>
+
+                <div class="bg-slate-100 p-3 rounded-lg border border-slate-300 text-xs font-mono text-slate-700">
+                    Заявка фиксируется в сменном журнале цеха ООО «Дельфин Групп» (п. Металлострой, дорога на Металлострой, д. 5, лит. П, тел. +7 (812) 464-87-12).
+                </div>
+
+                <div class="flex items-center justify-end gap-2.5 pt-2">
+                    <button type="button" data-action="close-modal" class="px-4 py-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-semibold text-sm cursor-pointer">
+                        Отмена
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-signal-orange hover:bg-orange-600 text-white font-bold text-sm shadow cursor-pointer">
+                        Отправить наряд и записать в журнал
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ВСПЛЫВАЮЩЕЕ СИСТЕМНОЕ УВЕДОМЛЕНИЕ (TOAST С ПОДДЕРЖКОЙ UNDO ВМЕСТО ALERT) -->
+    <div id="hmiToast" role="status" aria-live="polite" class="fixed bottom-5 right-5 z-50 hidden max-w-md bg-industrial-900 text-white px-4 py-3.5 rounded-xl border-2 border-signal-orange shadow-2xl flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-signal-orange flex items-center justify-center shrink-0 font-mono font-bold">✓</div>
+        <div class="text-xs sm:text-sm font-medium flex-1" id="hmiToastText">Операция выполнена</div>
+        <button type="button" id="hmiToastUndoBtn" data-action="undo-log-change" class="hidden px-2.5 py-1 rounded bg-industrial-800 hover:bg-industrial-700 text-orange-400 border border-orange-400/40 font-mono text-xs font-bold shrink-0 cursor-pointer">
+            Отменить
+        </button>
+    </div>
+
+    <!-- ПОЛНАЯ ИНЖЕНЕРНАЯ БАЗА ПРОБЛЕМ, ИНСТРУКЦИЙ И ЛОГИКА HMI (БЕЗ INLINE-ОБРАБОТЧИКОВ) -->
+    <script>
+        /**
+         * Полная база 8 проблем ТПА и пресс-форм ООО «Дельфин Групп»
+         */
+        const PROBLEMS_DB = [
+            {
+                id: 1,
+                code: "ERR-MOLD-01",
+                category: "classic",
+                tags: ["mold", "classic"],
+                categoryLabel: "Классическая ошибка литья",
+                severity: "high",
+                severityLabel: "ВЫСОКИЙ РИСК БРАКА",
+                title: "Недолив тонкостенного изделия",
+                subtitle: "Падение давления/скорости впрыска, засор сопла, малая доза или низкая температура расплава ПП",
+                node: "Узел впрыска / ГКС / Пресс-форма",
+                causes: [
+                    "Недостаточная скорость первой ступени впрыска (застывание тонкой стенки 0.45–0.65 мм до заполнения краёв)",
+                    "Частичное перекрытие сопла ТПА или инжектора горячеканальной системы (ГКС) пригоревшим полимером или инородным включением",
+                    "Малая доза набора или провал подушки расплава ниже 2 мм; раннее переключение на давление выдержки (V/P switchover)",
+                    "Заниженная температура расплава ПП (< 210 °C) или холодная матрица; запертый воздух из-за забитых выпаров"
+                ],
+                safety: [
+                    "Перед чисткой сопла или продувкой ГКС обязательно опустить защитный кожух зоны сопла и надеть термостойкие краги и защитный щиток лица.",
+                    "Отвести узел впрыска назад и сбросить остаточное давление в материальном цилиндре перед осмотром мундштука."
+                ],
+                tools: [
+                    "Контактный пирометр с термопарой типа К (проверка реальной T расплава и зон ГКС)",
+                    "Латунные щупы 0.01–0.05 мм и медный вороток для прочистки сопла",
+                    "Ключ динамометрический для мундштука сопла, весы лабораторные цеховые (контроль веса отливки ±0.1 г)"
+                ],
+                steps: [
+                    {
+                        title: "Контроль подушки расплава и дозы пластикации",
+                        detail: "Проверить фактическую подушку расплава после окончания выдержки под давлением. Если подушка 0 мм — увеличить ход набора дозы на 3–5 мм, чтобы стабильная подушка составляла 3.5–5.5 мм."
+                    },
+                    {
+                        title: "Проверка профиля скорости и давления впрыска (Гидроаккумулятор)",
+                        detail: "Для тонкостенной банки/шайбы ПП поднять скорость впрыска на основном участке заполнения до 280–420 мм/с и проверить давление азота в гидроаккумуляторе впрыска (норма 95–110 бар). Скорректировать точку переключения V→P ближе к концу заполнения (95–98% объёма)."
+                    },
+                    {
+                        title: "Проверка температурного профиля цилиндра и горячего канала (ГКС)",
+                        detail: "Сверить температуры цилиндра ПП: Зона 1 (бункер) 210 °C → Зона 2 225 °C → Зона 3 240 °C → Сопло 245 °C. На контроллере ГКС проверить ток потребления всех инжекторов; при холодном гнезде поднять температуру коллектора/инжектора на +5…+10 °C (не выше 255 °C)."
+                    },
+                    {
+                        title: "Продувка сопла и прочистка газоотводных выпаров пресс-формы",
+                        detail: "Отвести сопло от втулки, выполнить 2–3 свободных впрыска («прострела») в поддон для оценки равномерности струи расплава. Очистить газоотводные каналы по линии разъёма (0.015–0.025 мм) от парафинового налёта ПП."
+                    }
+                ],
+                params: [
+                    { param: "Температура расплава ПП (по зонам)", norm: "215 – 250 °C (ПТР 35–65)", action: "Повысить на +5...+10 °C при высокой вязкости" },
+                    { param: "Скорость впрыска (тонкостенная тара)", norm: "250 – 450 мм/с", action: "Включить контур гидроаккумулятора впрыска" },
+                    { param: "Подушка расплава (Cushion)", norm: "3.0 – 6.0 мм", action: "Не допускать падения в 0.0 мм" }
+                ]
+            },
+            {
+                id: 2,
+                code: "ERR-MOLD-02",
+                category: "classic",
+                tags: ["mold", "classic"],
+                categoryLabel: "Классическая ошибка литья",
+                severity: "high",
+                severityLabel: "РИСК ЗАЧЕКАНКИ ФОРМЫ",
+                title: "Облой по линии разъёма формы",
+                subtitle: "Падение усилия смыкания, превышение давления подпитки, износ запирающих кромок пресс-формы",
+                node: "Узел смыкания / Пресс-форма / Впрыск",
+                causes: [
+                    "Недостаточное усилие запирания ТПА (раскрытие («дыхание») плит в момент пикового давления впрыска)",
+                    "Запоздалое переключение с первой ступени впрыска на выдержку под давлением (переполнение гнезда и пик гидравлического давления)",
+                    "Механический износ, смятие или наклёп запирающих поясков пресс-формы, либо налипание остатков ПП/IML-этикетки на плоскость разъёма",
+                    "Чрезмерная температура расплава ПП (> 260 °C) и перегрев горячего канала, резко снижающие вязкость полимера"
+                ],
+                safety: [
+                    "КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО продолжать работу на автомате при появлении облоя на тонкостенной форме — это приводит к зачеканке запирающих поясков за 50–100 циклов.",
+                    "При осмотре и проверке прилегания краской («на синьку») перевести ТПА в наладочный режим и заблокировать узел впрыска."
+                ],
+                tools: [
+                    "Микрометр 0–25 мм (замер толщины буртика изделия и облоя)",
+                    "Проверочная берлинская лазурь («синька») и ветошь без ворса для теста пятна контакта поясков",
+                    "Набор индикаторных головок часового типа на магнитной стойке (контроль «дыхания» плит при впрыске)"
+                ],
+                steps: [
+                    {
+                        title: "Снижение пикового давления в полости (Коррекция точки V→P)",
+                        detail: "Раньше переключить ТПА со скорости впрыска на подпитку (увеличить координату переключения на 1.5–3.0 мм). Снизить давление выдержки (подпитки) первой ступени на 10–15 бар."
+                    },
+                    {
+                        title: "Проверка и корректировка усилия смыкания КРМ / Гидроцилиндра",
+                        detail: "Проверить фактическую настройку высоты формы и выпрямление рычагов КРМ. Увеличить усилие смыкания из расчёта 0.45–0.65 т/см² площади проекции тонкостенного изделия (в пределах паспорта ТПА 120–500 т)."
+                    },
+                    {
+                        title: "Осмотр плоскости разъёма и тест пятна запирания",
+                        detail: "Очистить запирающие кромки от прилипшего полимера. Нанести тонкий слой проверочной краски на матрицу, сомкнуть форму под рабочим усилием: пятно контакта по пояску должно быть непрерывным (не менее 85% периметра)."
+                    },
+                    {
+                        title: "Передача формы в ИУ при локальном износе кромки",
+                        detail: "Если облой идёт строго по одному сектору/гнезду при нормальном усилии смыкания — зафиксировать износ запирающего пояска (> 0.03 мм) и передать пресс-форму на инструментальный участок для притирки/лазерной наплавки."
+                    }
+                ],
+                params: [
+                    { param: "Удельное усилие запирания (тонкостенный ПП)", norm: "0.45 – 0.65 тс/см²", action: "Увеличить усилие смыкания (уменьшить высоту штампа)" },
+                    { param: "Давление подпитки (Holding Pressure)", norm: "35 – 60% от P впрыска", action: "Снизить на 10–15 бар, проверить точку V/P" },
+                    { param: "Допустимый зазор по запирающему пояску ПП", norm: "≤ 0.020 мм", action: "При зазоре > 0.03 мм — притирка на участке ИУ" }
+                ]
+            },
+            {
+                id: 3,
+                code: "ERR-MOLD-03",
+                category: "classic",
+                tags: ["mold", "classic"],
+                categoryLabel: "Классическая ошибка литья",
+                severity: "medium",
+                severityLabel: "НАРУШЕНИЕ ГЕОМЕТРИИ ТАРЫ",
+                title: "Утяжины и коробление геометрии банки/крышки",
+                subtitle: "Неравномерное охлаждение, засор каналов чиллера, малое время выдержки под давлением",
+                node: "Контур охлаждения / Чиллер / Выдержка",
+                causes: [
+                    "Разница температур между матрицей и пуансоном более 4–5 °C из-за засорения спиральных каналов охлаждения накипью или ржавчиной",
+                    "Недостаточное время или давление выдержки под давлением (расплав отходит обратно через незамёрзший впускной литник)",
+                    "Слишком ранний выброс горячего изделия (малое время охлаждения) или повышенная температура воды с чиллера (> 16 °C)",
+                    "Высокая анизотропия усадки кристаллического полипропилена при неравномерной толщине дна и буртика банки/крышки"
+                ],
+                safety: [
+                    "Перед отсоединением БРС-штуцеров водяных шлангов перекрыть подачу и обратку на гребёнке и сбросить давление воды.",
+                    "При продувке контуров формы сжатым воздухом направлять сливной шланг в закрытую ёмкость и использовать защитные очки."
+                ],
+                tools: [
+                    "Тепловизор цеховой или ИК-пирометр (сравнение температуры матрицы и пуансона по гнездам)",
+                    "Штангенциркуль цифровой 0–200 мм и калибр-кольцо (проверка овальности и защелкивания крышки на банке)",
+                    "Установка гидропневматической и химической промывки каналов охлаждения пресс-форм"
+                ],
+                steps: [
+                    {
+                        title: "Замер температур матрицы и пуансона + ревизия ротаметров",
+                        detail: "Сразу после открытия формы замерить температуру формообразующих. Проверить проток воды по каждому контуру на ротаметрах коллектора (норма ≥ 4–6 л/мин на контур, перепад ΔT вход/выход не более 2.5 °C)."
+                    },
+                    {
+                        title: "Продувка и промывка забитых контуров охлаждения",
+                        detail: "Если проток на одном из ротаметров упал более чем на 30%, переключить контур на реверсную продувку воздухом (6 бар). При известковом налёте подключить станцию кислотной промывки."
+                    },
+                    {
+                        title: "Корректировка профиля подпитки и времени охлаждения",
+                        detail: "Для устранения утяжин утолщённого замка крышки/дна увеличить время выдержки под давлением на 0.3–0.6 с (до момента перемерзания точки впуска). При короблении (сворачивании «восьмёркой») снизить давление 2-й ступени подпитки для снятия внутренних напряжений."
+                    },
+                    {
+                        title: "Проверка фиксации IML-этикетки и баланса съёма",
+                        detail: "При литье IML-тары проверить равномерность прижима этикетки статикой/вакуумом: смещение этикетки создаёт тепловой барьер и вызывает одностороннее коробление стенки."
+                    }
+                ],
+                params: [
+                    { param: "Температура охлаждающей воды (Чиллер)", norm: "10 – 14 °C", action: "Проверить задание чиллера и чистоту фильтра" },
+                    { param: "Перепад ΔT воды (Вход – Выход формы)", norm: "≤ 2.5 °C", action: "При ΔT > 4 °C прочистить каналы контура" },
+                    { param: "Время охлаждения тонкостенной тары ПП", norm: "1.8 – 3.5 с", action: "Увеличить на 0.3–0.5 с при овальности" }
+                ]
+            },
+            {
+                id: 4,
+                code: "ERR-MOLD-04",
+                category: "classic",
+                tags: ["mold", "classic"],
+                categoryLabel: "Классическая ошибка литья",
+                severity: "medium",
+                severityLabel: "ДЕСТРУКЦИЯ РАСПЛАВА / БРАК",
+                title: "Пригар («эффект дизеля»), чёрные точки и серебристые полосы",
+                subtitle: "Защемление воздуха в выпарах формы, деструкция полимера, влажность сырья или суперконцентрата",
+                node: "Выпары формы / Цилиндр / Бункер-сушилка",
+                causes: [
+                    "Адиабатическое сжатие воздуха («эффект дизеля» до 400–500 °C) в конце пути течения расплава из-за забитых газоотводных щелей (выпаров)",
+                    "Термическая деструкция ПП в «мёртвых зонах» коллектора ГКС, переходника сопла или на изношенном запорном кольце с отрывом чёрных карбонизированных точек",
+                    "Слишком высокое противодавление (подпор) и обороты шнека при наборе дозы, приводящие к сдвиговому перегреву и захвату воздуха (серебристые полосы — «свищи»)",
+                    "Попадание влажного вторичного дроблёного материала или отсыревшего красителя (мастербатча)"
+                ],
+                safety: [
+                    "При чистке матрицы в раскрытом положении ТПА нажать аварийный грибок «СТОП МОТОРА» или закрыть защитную дверь с активацией механического упора.",
+                    "При прогонке цилиндра чистящим компаундом обеспечить работу вытяжной вентиляции над узлом впрыска."
+                ],
+                tools: [
+                    "Очиститель пресс-форм от нагара и медный скребок / латунная щётка",
+                    "Чистящий компаунд для полиолефинов и ГКС",
+                    "Щупы 0.015 / 0.020 / 0.025 мм для проверки глубины газоотводных выпаров"
+                ],
+                steps: [
+                    {
+                        title: "Очистка газоотводных выпаров и торцов толкателей",
+                        detail: "Смыть парафиновый и сажевый нагар с газоотводных канавок по линии разъёма и в зоне замка банки. Проверить глубину выпаров щупом: для ПП норма 0.015–0.025 мм."
+                    },
+                    {
+                        title: "Профилирование скорости впрыска на финишном участке (Ступень замедления)",
+                        detail: "Чтобы устранить «эффект дизеля», разбить впрыск на 2–3 ступени: 90% объёма заполнять на высокой скорости (300–400 мм/с), а последние 10% хода шнека снизить скорость до 80–120 мм/с для спокойного выхода воздуха через выпары."
+                    },
+                    {
+                        title: "Проверка декомпрессии (отвода шнека) и подпора",
+                        detail: "При серебристых полосах (воздушных свищах) уменьшить ход декомпрессии после набора дозы до 1.5–2.5 мм и скорость декомпрессии до 15–25 мм/с, чтобы сопло не подсасывало воздух в расплав."
+                    },
+                    {
+                        title: "Прогонка цилиндра и ГКС при появлении чёрных точек",
+                        detail: "Проверить все зоны нагрева ГКС на перегрев (пробой симистора в шкафу ГКС). Снизить температуру цилиндра до 195 °C, прогнать чистящий компаунд или чистый высоковязкий ПП с короткими резкими впрысками для срыва нагара со стенок."
+                    }
+                ],
+                params: [
+                    { param: "Глубина газоотводных выпаров (ПП)", norm: "0.015 – 0.025 мм", action: "Чистить от налёта каждые 4–6 часов" },
+                    { param: "Ход декомпрессии (Suck-back)", norm: "1.5 – 3.0 мм", action: "При свищах уменьшить скорость и ход отвода" },
+                    { param: "Окружная скорость вращения шнека", norm: "≤ 0.5 – 0.7 м/с", action: "Снизить обороты при сдвиговом перегреве" }
+                ]
+            },
+            {
+                id: 5,
+                code: "ERR-HW-05",
+                category: "hardware",
+                tags: ["hardware"],
+                categoryLabel: "Аппаратный сбой узла смыкания",
+                severity: "critical",
+                severityLabel: "АВАРИЙНЫЙ ОСТАНОВ СТАНКА",
+                title: "Не развивается усилие смыкания / перекос плит",
+                subtitle: "Срабатывание защиты формы низкого давления, износ пальцев КРМ, сбой линейки положения",
+                node: "Узел смыкания / КРМ / Потенциометрическая линейка",
+                causes: [
+                    "Срабатывание таймера защиты формы низкого давления из-за застрявшего литника/изделия, сухого трения башмаков подвижной плиты или задира направляющих колонок",
+                    "Износ пальцев и бронзовых/стальных втулок пятишарнирного КРМ из-за обрыва трубки централизованной смазки или падения давления лубрикатора",
+                    "Дрейф нуля или пробой дорожки потенциометрической/магнитострикционной линейки положения подвижной плиты (CLAMP POS)",
+                    "Разбалансировка натяжения гаек четырёх колонн ТПА, вызывающая перекос плит (> 0.08 мм/м)"
+                ],
+                safety: [
+                    "ОБЯЗАТЕЛЬНАЯ БЛОКИРОВКА LOTO: при входе в зону КРМ или пространство между плитами выключить главный привод насоса, установить механический страховочный брус и повесить личный замок на рубильник.",
+                    "Не загрублять давление защиты формы выше 30–35 бар — это приведёт к раздавливанию формообразующих при попадании невыпавшего изделия!"
+                ],
+                tools: [
+                    "Мультиметр цифровой (проверка напряжения 0–10 В и сопротивления линейки положения плиты)",
+                    "Набор плоских щупов 0.02–0.50 мм и магнитная стойка с индикатором ИЧ-10 (проверка люфта пальцев КРМ и параллельности плит)",
+                    "Шприц смазочный высокого давления и ключ регулировки башмаков станины"
+                ],
+                steps: [
+                    {
+                        title: "Проверка зоны разъёма и скольжения подвижной плиты",
+                        detail: "Убедиться в отсутствии застрявшей отливки или облоя между плитами. В ручном режиме проверить плавность хода подвижной плиты: осмотреть опорные башмаки на направляющих станины и зазор (0.03–0.05 мм)."
+                    },
+                    {
+                        title: "Диагностика линейки положения смыкания и точки перехода ВД",
+                        detail: "На экране диагностики ПЛК проконтролировать показания линейки смыкания при полностью закрытой форме (должно быть 0.0–0.2 мм без скачков). Если показания «прыгают» — протереть шток, проверить разъём или заменить линейку и выполнить калибровку нуля."
+                    },
+                    {
+                        title: "Ревизия системы смазки и люфтов пальцев КРМ",
+                        detail: "Проверить манометр станции смазки КРМ (при цикле прокачки давление должно подниматься до 15–25 бар) и целостность всех медных/пластиковых трубок к шарнирам. Индикатором замерить радиальный люфт центрального крестовика и пальцев КРМ (при износе > 0.18 мм — план на замену втулок)."
+                    },
+                    {
+                        title: "Настройка окна защиты формы низкого давления (Low Pressure Mold Protect)",
+                        detail: "Установить начало участка низкого давления за 30–50 мм до касания половин формы, а точку включения высокого давления запирания — за 0.5–1.0 мм до полного смыкания."
+                    }
+                ],
+                params: [
+                    { param: "Давление защиты пресс-формы (НД)", norm: "15 – 28 бар", action: "ЗАПРЕЩЕНО поднимать выше 35 бар" },
+                    { param: "Координата включения ВД запирания", norm: "0.5 – 1.2 мм до 0", action: "Откалибровать ноль линейки смыкания" },
+                    { param: "Непараллельность плит ТПА", norm: "≤ 0.05 мм на 1000 мм", action: "Выровнять гайки колонн по индикатору" }
+                ]
+            },
+            {
+                id: 6,
+                code: "ERR-HW-06",
+                category: "hardware",
+                tags: ["hardware"],
+                categoryLabel: "Аппаратный сбой узла пластикации",
+                severity: "high",
+                severityLabel: "НЕСТАБИЛЬНЫЙ ЦИКЛ / СБОЙ ДОЗЫ",
+                title: "Прокручивание шнека без набора дозы / нестабильная подушка расплава",
+                subtitle: "Износ запорного кольца — торпеды, обрыв термопары ТХК или пробой кольцевого ТЭНа",
+                node: "Материальный цилиндр / Шнек / Нагрев ТЭН и ТХК",
+                causes: [
+                    "Односторонний износ или трещина запорного кольца (обратного клапана «торпеды») и седла: при впрыске расплав перетекает назад в витки шнека",
+                    "Козление («мост») гранул или агломерация сырья в загрузочной воронке из-за перегрева зоны загрузки (отсутствие протока воды охлаждения горловины бункера)",
+                    "Обрыв термопары ТХК/ТХА (показания 999 °C или ложное занижение) либо перегорание кольцевого миканитового/керамического ТЭНа одной из зон",
+                    "Падение давления подпора или пробуксовка гидромотора/сервопривода пластикации"
+                ],
+                safety: [
+                    "ПЕРЕД РАБОТОЙ В КЛЕММНОЙ КОРОБКЕ ЦИЛИНДРА: отключить автомат питания силовых цепей нагрева (380/220 В) в электрошкафу ТПА и убедиться в отсутствии напряжения указателем.",
+                    "При демонтаже головки цилиндра и извлечении горячего шнека (220 °C) использовать краги КЩС/спилковые и медный инструмент."
+                ],
+                tools: [
+                    "Токовые клещи и мультиметр с режимом мегомметра (проверка тока фаз ТЭНов и пробоя на корпус)",
+                    "Калибратор/тестер термопар ТХК (тип J) / ТХА (тип K)",
+                    "Гидравлический съёмник/ключи для фланца материального цилиндра и микрометр 25–75 мм"
+                ],
+                steps: [
+                    {
+                        title: "Тест герметичности обратного клапана шнека (Торпеды)",
+                        detail: "Набрать полную дозу, отключить подпитку или подать статическое давление впрыска при перекрытом сопле: если шнек продолжает медленно ползти вперёд без остановки на подушке, а вес изделий «гуляет» более чем на ±1.5 г — запорное кольцо изношено и требует замены."
+                    },
+                    {
+                        title: "Проверка охлаждения загрузочной горловины бункера",
+                        detail: "Замерить температуру корпуса под бункером сырья (норма 45–65 °C). Если горловина горячая (> 80 °C), гранула ПП подплавляется и налипает на корень шнека — прочистить водяную рубашку зоны загрузки и закрыть шибер для удаления спекшейся корки."
+                    },
+                    {
+                        title: "Электрическая диагностика кольцевых ТЭНов и термопар ТХК",
+                        detail: "Токовыми клещами замерить рабочий ток каждой зоны нагрева в шкафу ТПА при 100% включении твердотельного реле (SSR). Проверить плотность прижима пружинного байонета термопары ТХК в гнезде цилиндра (при выходе термопары из колодца зона уходит в неконтролируемый перегрев)."
+                    },
+                    {
+                        title: "Демонтаж мундштука и ревизия узла «наконечник–кольцо–седло»",
+                        detail: "При подтверждённом износе торпеды разогреть переднюю зону до 230 °C, ослабить болты фланца по горячему, выдвинуть кончик шнека на 120 мм и заменить комплект обратного клапана (смазав резьбу высокотемпературной медной/никелевой пастой до 1100 °C)."
+                    }
+                ],
+                params: [
+                    { param: "Разброс подушки расплава от цикла к циклу", norm: "≤ ± 0.3 мм", action: "При разбросе > 1.5 мм заменить запорное кольцо" },
+                    { param: "Температура рубашки под бункером сырья", norm: "45 – 65 °C", action: "Обеспечить постоянный проток воды охлаждения" },
+                    { param: "Сопротивление кольцевого ТЭНа (1.5–3 кВт)", norm: "16 – 35 Ом (Изоляция > 5 МОм)", action: "Заменить ТЭН или SSR-реле при обрыве" }
+                ]
+            },
+            {
+                id: 7,
+                code: "ERR-HW-07",
+                category: "hardware",
+                tags: ["hardware", "mold"],
+                categoryLabel: "Аппаратный сбой гидросистемы",
+                severity: "critical",
+                severityLabel: "КРИТИЧЕСКИЙ ПЕРЕГРЕВ > 55 °C",
+                title: "Падение давления в гидросистеме и перегрев масла выше 55 °C",
+                subtitle: "Залипание пропорционального клапана давления/потока, засор маслоохладителя, кавитация насоса",
+                node: "Гидростанция / Пропорциональные клапаны PQ / Теплообменник",
+                causes: [
+                    "Прекращение протока воды или зарастание известковым налётом трубок водомасляного теплообменника (маслоохладителя), отказ термостата",
+                    "Залипание золотника главного пропорционального клапана давления/потока (PQ) или предохранительного клапана из-за шлама/лаковых отложений в масле",
+                    "Постоянный сброс масла высокого давления через перепускной клапан в бак (внутренний перелив), вызывающий стремительный нагрев гидросистемы",
+                    "Засорение всасывающего фильтра в гидробаке или подсос воздуха во всасывающий патрубок, вызывающий кавитацию и вой насоса"
+                ],
+                safety: [
+                    "ОПАСНОСТЬ ОЖОГА ВЫСОКИМ ДАВЛЕНИЕМ: перед разборкой любого гидрораспределителя выключить насос, сбросить давление в гидроаккумуляторах до 0 бар по манометру и дождаться остывания корпуса ниже 45 °C.",
+                    "Не запускать насос ТПА при температуре масла выше 60 °C — это приводит к разрушению уплотнений гидроцилиндров и задиру качающего узла насоса."
+                ],
+                tools: [
+                    "Гидротестер / контрольный глицериновый манометр 0–250 бар на микрошланге (точки замера M1/M2)",
+                    "Мультиметр (проверка управляющего сигнала 0–10 В / 4–20 мА и тока катушки пропорционального клапана 0–2.5 А)",
+                    "Шомпол медный и установка промывки трубчатого маслоохладителя"
+                ],
+                steps: [
+                    {
+                        title: "Ревизия контура охлаждения масла и водомасляного теплообменника",
+                        detail: "Проверить открытие электромагнитного водяного клапана (термостата) охлаждения масла и температуру выходной трубки теплообменника. Снять торцевые крышки кожухотрубного маслоохладителя и прочистить медные трубки от ила и накипи."
+                    },
+                    {
+                        title: "Проверка пропорционального клапана давления/потока (PQ-клапан)",
+                        detail: "В режиме теста гидравлики на панели ТПА задать 30%, 60% и 100% давления/скорости, контролируя ток на катушке (24 В DC, ШИМ) и давление по манометру. При зависании давления снять пилот пропорционального клапана, промыть золотник и жиклёр в чистом нефрасе и продуть."
+                    },
+                    {
+                        title: "Поиск очага внутреннего перелива (Пирометрическая диагностика)",
+                        detail: "Тепловизором или пирометром просканировать гидроплиты и клапаны разгрузки гидроаккумулятора: узел, через который идёт паразитный дроссельный сброс масла под давлением, будет иметь локальную температуру на 10–15 °C выше температуры бака."
+                    },
+                    {
+                        title: "Контроль всасывающего фильтра и состояния масла HLP-46",
+                        detail: "При характерном кавитационном гуле насоса и вспенивании масла в смотровом окне проверить уровень масла в баке, герметичность хомутов всасывающего рукава и промыть/заменить сетчатый всасывающий фильтр (125–150 мкм)."
+                    }
+                ],
+                params: [
+                    { param: "Рабочая температура гидравлического масла HLP-46", norm: "40 – 50 °C (Авария 55 °C)", action: "При T > 55 °C остановить цикл и прочистить холодильник" },
+                    { param: "Системное давление насоса (При 100% PQ)", norm: "140 – 175 бар", action: "Проверить пилот и золотник клапана давления" },
+                    { param: "Ток катушки пропорционального клапана", norm: "0.2 – 2.2 А (Сопротивление 8–22 Ом)", action: "Проверить усилитель (плату PQ) в шкафу" }
+                ]
+            },
+            {
+                id: 8,
+                code: "ERR-HW-08",
+                category: "hardware",
+                tags: ["hardware", "mold"],
+                categoryLabel: "Аппаратный сбой оснастки / съёма",
+                severity: "critical",
+                severityLabel: "УГРОЗА ПОЛОМКИ ПРЕСС-ФОРМЫ",
+                title: "Заклинивание толкателей или повреждение формообразующих пресс-формы",
+                subtitle: "Попадание инородного тела в расплав, износ направляющих колонок и втулок, сбой пневмосдува",
+                node: "Система выталкивания / Пресс-форма / Пневмоклапан сдува",
+                causes: [
+                    "Задир цилиндрических/ступенчатых толкателей или плиты съёма из-за перекоса, сухого трения, налипания облоя ПП в зазор толкателя",
+                    "Износ центрирующих направляющих колонок, втулок или конических замков тонкостенной пресс-формы, приводящий к эксцентриситету пуансона и матрицы",
+                    "Отказ электромагнитного пневмоклапана сдува (Air Blow) или падение давления цеховой пневмомагистрали ниже 5 бар — изделие остаётся на пуансоне",
+                    "Попадание металлического включения в расплав из бункера (мимо магнитной решётки) с забоиной на запирающем пояске или инжекторе"
+                ],
+                safety: [
+                    "НЕМЕДЛЕННЫЙ ОСТАНОВ СТАНКА: при любом скрежете, ударе или неполном возврате плиты толкателей перевести ТПА в ручной режим и отключить гидропривод.",
+                    "КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО смыкать пресс-форму до визуальной проверки датчика возврата плиты выталкивателей (Ejector Back Limit Switch)!"
+                ],
+                tools: [
+                    "Медные выколотки, латунные клинья и динамометрический ключ (запрещено использовать стальные отвёртки на зеркале формы!)",
+                    "Высокотемпературная белая ПТФЭ/керамическая смазка для толкателей и направляющих колонок (без силикона для IML-тары)",
+                    "Индикатор часового типа и микрометрический нутромер (проверка зазора колонка–втулка)"
+                ],
+                steps: [
+                    {
+                        title: "Осмотр формообразующих и проверка датчика возврата толкателей",
+                        detail: "Удалить застрявшее изделие медным или деревянным инструментом. В наладочном режиме на минимальной скорости (10–15%) и давлении (20 бар) проверить ход плиты выталкивания вперёд-назад и чёткое срабатывание индуктивного датчика исходного положения толкателей."
+                    },
+                    {
+                        title: "Диагностика пневмоклапанов сдува и воздушных клапанов пуансона",
+                        detail: "На тонкостенных формах банок/шайб съём идёт комбинированно (кольцо съёма + пневмоклапан в торце пуансона). Проверить давление воздуха на блоке подготовки (норма 6.0–8.0 бар), срабатывание катушки 24 В пневмораспределителя и ход тарельчатого воздушного клапана в пуансоне (0.3–0.5 мм)."
+                    },
+                    {
+                        title: "Проверка направляющих колонок, конических замков и смазка",
+                        detail: "Очистить направляющие колонки и центрирующие конусные замки формы от чёрной выработки. При обнаружении задиров на толкателях или колонках — снять форму на участок ИУ для распрессовки, полировки и замены заклинившего толкателя."
+                    },
+                    {
+                        title: "Ревизия магнитного уловителя в бункере при попадании металла",
+                        detail: "Если на матрице или в сопле обнаружена вмятина от металла — выгрузить сырьё из бункера, очистить решётку магнитного сепаратора от стружки и передать форму слесарям-инструментальщикам для лазерной наплавки и слесарной доводки."
+                    }
+                ],
+                params: [
+                    { param: "Давление сжатого воздуха пневмосдува", norm: "6.0 – 8.0 бар (сухой, без масла)", action: "Проверить пневмоклапан и фильтр-влагоотделитель" },
+                    { param: "Зазор направляющая колонка – втулка", norm: "0.015 – 0.030 мм", action: "При задире — замена пары на участке ИУ" },
+                    { param: "Зазор по посадочному пояску толкателя (ПП)", norm: "0.010 – 0.020 мм", action: "При облое по толкателю — замена толкателя" }
+                ]
+            }
+        ];
+
+        // Начальные демо-записи для сменного журнала (если localStorage пуст)
+        const DEFAULT_SHIFT_LOGS = [
+            {
+                id: "LOG-101",
+                time: "Сегодня, 09:40",
+                shift: "Смена А (Дневная 08:00–20:00)",
+                machine: "ТПА №01 — Скоростной 280т (IML-контейнер)",
+                problemIds: [1, 4],
+                problemTitles: ["(1) Недолив тонкостенного изделия", "(4) Пригар («эффект дизеля»), чёрные точки"],
+                stepsProgress: "8 / 8 шагов",
+                status: "Устранено"
+            },
+            {
+                id: "LOG-102",
+                time: "Сегодня, 11:15",
+                shift: "Смена А (Дневная 08:00–20:00)",
+                machine: "ТПА №04 — Гидравлический 320т (Тара ПП)",
+                problemIds: [7],
+                problemTitles: ["(7) Падение давления в гидросистеме и перегрев масла > 55 °C"],
+                stepsProgress: "3 / 4 шагов",
+                status: "В работе"
+            },
+            {
+                id: "LOG-103",
+                time: "Вчера, 22:30",
+                shift: "Смена Б (Ночная 20:00–08:00)",
+                machine: "ТПА №02 — Скоростной 220т (Пресервная шайба)",
+                problemIds: [2, 8],
+                problemTitles: ["(2) Облой по линии разъёма формы", "(8) Заклинивание толкателей / сбой пневмосдува"],
+                stepsProgress: "5 / 8 шагов",
+                status: "Передано в ИУ"
+            }
+        ];
+
+        // Глобальное состояние приложения
+        let selectedProblemIds = new Set();
+        let completedStepsState = {};
+        let dailyChecksState = [false, false, false, false, false, false];
+        let activeCategory = "all";
+        let currentSearchQuery = "";
+        let shiftLogs = [];
+        let lastLogsBackup = null; // Резервная копия журнала для кнопки «Отменить» (Undo)
+
+        const STORAGE_KEY_LOGS = "delgroup_tpa_master_logs_v1";
+        const STORAGE_KEY_STATE = "delgroup_tpa_master_state_v1";
+
+        // Флаг доступности localStorage (приватный режим / iframe могут блокировать хранилище)
+        let storageOk = true;
+        try {
+            const k = "__tpa_test__";
+            localStorage.setItem(k, "1");
+            localStorage.removeItem(k);
+        } catch (e) {
+            storageOk = false;
+        }
+
+        // Ключ шага для восстановления фокуса после перерисовки инструкции
+        let restoreStepFocusKey = null;
+
+        /**
+         * Сохранение полного состояния диагностики (выбор ошибок, шаги, чек-лист смены, станок, смена)
+         */
+        function persistState() {
+            if (!storageOk) return;
+            try {
+                localStorage.setItem(STORAGE_KEY_STATE, JSON.stringify({
+                    problems: Array.from(selectedProblemIds),
+                    steps: completedStepsState,
+                    dailyChecks: dailyChecksState,
+                    machine: document.getElementById("machineSelect")?.value || "",
+                    shift: document.getElementById("shiftSelect")?.value || ""
+                }));
+            } catch (e) {
+                // квота/приватный режим
+            }
+        }
+
+        /**
+         * Восстановление состояния после перезагрузки страницы
+         */
+        function loadStateFromStorage() {
+            if (!storageOk) return;
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY_STATE);
+                if (!raw) return;
+                const s = JSON.parse(raw);
+                if (Array.isArray(s.problems)) selectedProblemIds = new Set(s.problems);
+                if (s.steps && typeof s.steps === "object") completedStepsState = s.steps;
+                if (Array.isArray(s.dailyChecks) && s.dailyChecks.length === 6) {
+                    dailyChecksState = s.dailyChecks.map(Boolean);
+                }
+                if (s.machine) setSelectValue("machineSelect", s.machine);
+                if (s.shift) setSelectValue("shiftSelect", s.shift);
+            } catch (e) {
+                // повреждённый JSON
+            }
+        }
+
+        /**
+         * Синхронизация чекбоксов ежесменного осмотра с состоянием dailyChecksState
+         */
+        function syncDailyChecklistDOM() {
+            const checks = document.querySelectorAll(".daily-check");
+            let done = 0;
+            checks.forEach((c, idx) => {
+                c.checked = !!dailyChecksState[idx];
+                if (c.checked) done++;
+            });
+            const badge = document.getElementById("dailyChecklistProgress");
+            if (badge) {
+                badge.textContent = `Выполнено: ${done} / ${checks.length}`;
+                badge.className = done === checks.length
+                    ? "font-mono text-xs font-bold px-3 py-1 rounded bg-signal-green text-white"
+                    : "font-mono text-xs font-bold px-3 py-1 rounded bg-industrial-900 text-white";
+            }
+        }
+
+        function updateDailyChecklistFromDOM() {
+            const checks = document.querySelectorAll(".daily-check");
+            dailyChecksState = Array.from(checks).map(c => c.checked);
+            syncDailyChecklistDOM();
+            persistState();
+        }
+
+        function resetDailyChecklist() {
+            dailyChecksState = [false, false, false, false, false, false];
+            syncDailyChecklistDOM();
+            persistState();
+            showToast("Чек-лист приёмки смены сброшен");
+        }
+
+        /**
+         * Обновление счётчиков на табах категорий с учётом поискового запроса
+         */
+        function updateCategoryTabCounts() {
+            const query = currentSearchQuery.trim().toLowerCase();
+            const matchQuery = (item) => {
+                if (!query) return true;
+                const haystack = `${item.id} ${item.code} ${item.title} ${item.subtitle} ${item.node} ${item.causes.join(" ")}`.toLowerCase();
+                return haystack.includes(query);
+            };
+
+            const counts = {
+                all: PROBLEMS_DB.filter(matchQuery).length,
+                classic: PROBLEMS_DB.filter(i => i.tags.includes("classic") && matchQuery(i)).length,
+                hardware: PROBLEMS_DB.filter(i => i.tags.includes("hardware") && matchQuery(i)).length,
+                mold: PROBLEMS_DB.filter(i => i.tags.includes("mold") && matchQuery(i)).length
+            };
+
+            const labels = {
+                all: `Все проблемы (${counts.all})`,
+                classic: `Классические ошибки литья и ТПА (${counts.classic})`,
+                hardware: `Нетипичные и аппаратные сбои (${counts.hardware})`,
+                mold: `Пресс-формы и охлаждение (${counts.mold})`
+            };
+
+            Object.keys(labels).forEach(key => {
+                const btn = document.getElementById(`tab-${key}`);
+                if (btn) btn.textContent = labels[key];
+            });
+        }
+
+        /**
+         * Рендер 8 карточек проблем с учётом фильтра вкладок и строки поиска
+         */
+        function renderProblemsGrid() {
+            const grid = document.getElementById("problemsGrid");
+            if (!grid) return;
+
+            updateCategoryTabCounts();
+
+            const query = currentSearchQuery.trim().toLowerCase();
+
+            const filtered = PROBLEMS_DB.filter(item => {
+                const matchesCategory = activeCategory === "all" || item.tags.includes(activeCategory);
+                if (!matchesCategory) return false;
+
+                if (!query) return true;
+                const haystack = `${item.id} ${item.code} ${item.title} ${item.subtitle} ${item.node} ${item.causes.join(" ")}`.toLowerCase();
+                return haystack.includes(query);
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="md:col-span-2 bg-white border-2 border-dashed border-slate-300 rounded-xl p-8 text-center space-y-3">
+                        <div class="text-base font-bold text-industrial-900">По запросу «${escapeHtml(currentSearchQuery)}» симптомов не найдено</div>
+                        <p class="text-xs sm:text-sm text-slate-600">Попробуйте сбросить фильтр категории или очистить строку быстрого поиска.</p>
+                        <button type="button" data-action="reset-filters" class="px-4 py-2 rounded-lg bg-industrial-900 text-white text-xs font-bold cursor-pointer">
+                            Показать все 8 проблем ТПА
+                        </button>
+                    </div>
+                `;
+                updateCountersUI();
+                return;
+            }
+
+            grid.innerHTML = filtered.map(item => {
+                const isSelected = selectedProblemIds.has(item.id);
+                const borderClass = isSelected
+                    ? "border-signal-orange bg-orange-50/40 ring-2 ring-signal-orange/30"
+                    : "border-slate-300 bg-white hover:border-slate-400";
+
+                const severityBadge = item.severity === "critical"
+                    ? `<span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-red-100 text-red-700 border border-red-300">${item.severityLabel}</span>`
+                    : item.severity === "high"
+                        ? `<span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-700 border border-orange-300">${item.severityLabel}</span>`
+                        : `<span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-300">${item.severityLabel}</span>`;
+
+                const typeBadge = item.category === "classic"
+                    ? `<span class="font-mono text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-300">Классическая литья</span>`
+                    : `<span class="font-mono text-xs px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">Аппаратный сбой ТПА</span>`;
+
+                return `
+                    <div data-action="toggle-problem" data-problem-id="${item.id}" role="checkbox" tabindex="0" aria-checked="${isSelected}" aria-label="${escapeHtml(item.title)}" class="problem-card rounded-xl border-2 ${borderClass} p-4 sm:p-5 shadow-sm transition cursor-pointer select-none flex flex-col justify-between gap-4">
+                        <div class="space-y-3">
+                            <!-- Верхняя строка карточки: Чекбокс + Номер + Бейджи -->
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex items-start gap-3">
+                                    <input
+                                        type="checkbox"
+                                        ${isSelected ? "checked" : ""}
+                                        tabindex="-1"
+                                        aria-hidden="true"
+                                        class="hmi-checkbox mt-0.5 pointer-events-none"
+                                    >
+                                    <div>
+                                        <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                                            <span class="font-mono text-xs font-extrabold px-2 py-0.5 rounded bg-industrial-900 text-white">#${item.id}</span>
+                                            <span class="font-mono text-xs font-bold text-slate-500">${item.code}</span>
+                                            ${typeBadge}
+                                            ${severityBadge}
+                                        </div>
+                                        <h3 class="text-base sm:text-lg font-extrabold text-industrial-900 leading-snug">
+                                            ${item.title}
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Подзаголовок из технического задания -->
+                            <p class="text-xs sm:text-sm font-medium text-slate-700 bg-slate-100/90 p-2.5 rounded-lg border border-slate-200">
+                                ${item.subtitle}
+                            </p>
+
+                            <!-- Ключевые причины (увеличен кегль до text-sm для чтения у станка) -->
+                            <ul class="space-y-1.5 text-xs sm:text-sm text-slate-700 pl-1 leading-snug">
+                                ${item.causes.slice(0, 3).map(c => `
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-signal-orange font-bold mt-0.5">•</span>
+                                        <span>${c}</span>
+                                    </li>
+                                `).join("")}
+                            </ul>
+                        </div>
+
+                        <!-- Нижняя панель узла и статуса выбора -->
+                        <div class="pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-500">Узел: <strong class="text-industrial-900">${item.node}</strong></span>
+                            <span class="${isSelected ? 'text-signal-orange font-bold' : 'text-slate-400'}">
+                                ${isSelected ? '✓ Включено в регламент' : 'Нажмите для выбора'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+
+            updateCountersUI();
+        }
+
+        /**
+         * Переключение чекбокса проблемы
+         */
+        function toggleProblemSelection(id) {
+            const numId = Number(id);
+            if (!numId) return;
+            if (selectedProblemIds.has(numId)) {
+                selectedProblemIds.delete(numId);
+            } else {
+                selectedProblemIds.add(numId);
+            }
+            persistState();
+            renderProblemsGrid();
+            renderSolutionPanel();
+        }
+
+        /**
+         * Быстрый переход и выбор проблемы из справочника узлов (с сохранением в localStorage)
+         */
+        function toggleProblemFromUnit(id) {
+            const numId = Number(id);
+            if (!numId) return;
+            selectedProblemIds.add(numId);
+            persistState();
+            renderProblemsGrid();
+            renderSolutionPanel();
+            const solEl = document.getElementById("solution");
+            if (solEl) solEl.scrollIntoView({ behavior: "smooth" });
+            showToast(`Проблема #${numId} добавлена в сводный регламент ремонта`);
+        }
+
+        /**
+         * Обновление счётчиков выбранных проблем, состояния кнопок и индикатора статуса цеха
+         */
+        function updateCountersUI() {
+            const count = selectedProblemIds.size;
+            const navBadge = document.getElementById("navSelectedBadge");
+            const mobileBadge = document.getElementById("mobileNavBadge");
+            const countText = document.getElementById("selectedCountText");
+            const summaryCount = document.getElementById("summaryBadgeCount");
+            const summaryTitle = document.getElementById("summaryBannerTitle");
+            const summarySub = document.getElementById("summaryBannerSub");
+            const floatingBanner = document.getElementById("floatingActionSummary");
+
+            if (navBadge) navBadge.textContent = count;
+            if (mobileBadge) mobileBadge.textContent = count;
+            if (countText) {
+                countText.textContent = `${count} из 8`;
+                countText.classList.toggle("text-signal-orange", count > 0);
+                countText.classList.toggle("text-industrial-900", count === 0);
+            }
+            if (summaryCount) summaryCount.textContent = count;
+
+            // Делаем плашку перехода к регламенту липкой внизу экрана, когда выбраны проблемы
+            if (floatingBanner) {
+                floatingBanner.classList.toggle("sticky", count > 0);
+                floatingBanner.classList.toggle("bottom-4", count > 0);
+                floatingBanner.classList.toggle("z-30", count > 0);
+            }
+
+            // Управление активностью кнопок в шапке регламента
+            const btnCopy = document.getElementById("btnCopyInstruction");
+            const btnPrint = document.getElementById("btnPrintInstruction");
+            const btnSave = document.getElementById("btnSaveToLog");
+            if (btnCopy) btnCopy.disabled = count === 0;
+            if (btnPrint) btnPrint.disabled = count === 0;
+            if (btnSave) btnSave.disabled = count === 0;
+
+            if (count === 0) {
+                if (summaryTitle) summaryTitle.textContent = "Не выбрано ни одной проблемы ТПА";
+                if (summarySub) summarySub.textContent = "Отметьте галочками карточки выше, чтобы сформировать сводную пошаговую инструкцию.";
+            } else {
+                const selectedNumbers = Array.from(selectedProblemIds).sort((a, b) => a - b).map(n => `#${n}`).join(", ");
+                if (summaryTitle) summaryTitle.textContent = `Сформирован сводный регламент по проблемам: ${selectedNumbers}`;
+                if (summarySub) summarySub.textContent = `Агрегированы меры безопасности LOTO, перечень инструмента и пошаговый чек-лист наладчика.`;
+            }
+
+            updateShopHeaderStatus();
+        }
+
+        /**
+         * Динамическое обновление индикатора статуса цеха в шапке
+         */
+        function updateShopHeaderStatus() {
+            const dotWrap = document.getElementById("shopStatusDotWrap");
+            const dot = document.getElementById("shopStatusDot");
+            const text = document.getElementById("shopStatusText");
+            if (!dotWrap || !dot || !text) return;
+
+            const selectedItems = PROBLEMS_DB.filter(p => selectedProblemIds.has(p.id));
+            const hasCritical = selectedItems.some(i => i.severity === "critical");
+            const activeLogsCount = shiftLogs.filter(l => l.status === "В работе").length;
+
+            if (hasCritical) {
+                dotWrap.className = "relative flex h-2.5 w-2.5 text-red-400 pulse-dot";
+                dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500";
+                text.className = "font-mono text-red-400 font-semibold";
+                text.textContent = "АВАРИЙНАЯ ДИАГНОСТИКА";
+            } else if (selectedItems.length > 0 || activeLogsCount > 0) {
+                dotWrap.className = "relative flex h-2.5 w-2.5 text-amber-400 pulse-dot";
+                dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500";
+                text.className = "font-mono text-amber-400 font-semibold";
+                text.textContent = `В РАБОТЕ НАЛАДЧИКА (${activeLogsCount || selectedItems.length})`;
+            } else {
+                dotWrap.className = "relative flex h-2.5 w-2.5 text-emerald-400 pulse-dot";
+                dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500";
+                text.className = "font-mono text-emerald-400 font-semibold";
+                text.textContent = "ЛИНИИ В РАБОТЕ • 24/7";
+            }
+        }
+
+        /**
+         * Построение динамического блока «Полное решение и пошаговая инструкция по ремонту»
+         */
+        function renderSolutionPanel() {
+            const container = document.getElementById("solutionDynamicContainer");
+            const critBadge = document.getElementById("solutionCriticalityBadge");
+            const subtitle = document.getElementById("solutionSubtitle");
+            updateMachineTagUI();
+
+            if (!container) return;
+
+            const selectedItems = PROBLEMS_DB.filter(p => selectedProblemIds.has(p.id));
+
+            // Если ничего не выбрано
+            if (selectedItems.length === 0) {
+                if (critBadge) {
+                    critBadge.className = "px-2.5 py-0.5 rounded bg-slate-700 text-slate-200 font-mono text-xs font-bold uppercase";
+                    critBadge.textContent = "ОЖИДАНИЕ ВЫБОРА";
+                }
+                if (subtitle) {
+                    subtitle.textContent = "Ни одна проблема не отмечена. Отметьте чекбоксы в разделе диагностики выше или загрузите типовой производственный кейс.";
+                }
+
+                container.innerHTML = `
+                    <div class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl p-8 sm:p-12 text-center space-y-4">
+                        <div class="w-14 h-14 rounded-xl bg-industrial-900 text-orange-400 mx-auto flex items-center justify-center">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-extrabold text-industrial-900">Отметьте галочками неисправности на ТПА</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 max-w-xl mx-auto">
+                            Вы можете выбрать как одну конкретную ошибку (например, «Недолив тонкостенного изделия»), так и комбинацию из нескольких симптомов одновременно. Система автоматически объединит шаги ремонта.
+                        </p>
+                        <div class="flex flex-wrap justify-center gap-3 pt-2">
+                            <button type="button" data-action="load-preset" data-preset="thinwall" class="px-4 py-2.5 rounded-lg bg-signal-orange hover:bg-orange-600 text-white text-xs sm:text-sm font-bold shadow cursor-pointer">
+                                Загрузить кейс: Скоростное литьё тары (Проблемы #1 + #3 + #4)
+                            </button>
+                            <button type="button" data-action="load-preset" data-preset="hydraulic" class="px-4 py-2.5 rounded-lg bg-industrial-900 hover:bg-industrial-800 text-white text-xs sm:text-sm font-bold shadow cursor-pointer">
+                                Загрузить кейс: Аппаратный сбой ТПА (Проблемы #5 + #6 + #7)
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Вычисление сводного уровня критичности
+            const hasCritical = selectedItems.some(i => i.severity === "critical");
+            const hasHigh = selectedItems.some(i => i.severity === "high");
+
+            if (critBadge) {
+                if (hasCritical) {
+                    critBadge.className = "px-2.5 py-0.5 rounded bg-signal-red text-white font-mono text-xs font-bold uppercase";
+                    critBadge.textContent = "КРИТИЧЕСКИЙ УРОВЕНЬ • ОСТАНОВИТЬ ЦИКЛ";
+                } else if (hasHigh) {
+                    critBadge.className = "px-2.5 py-0.5 rounded bg-signal-orange text-white font-mono text-xs font-bold uppercase";
+                    critBadge.textContent = "ВЫСОКИЙ ПРИОРИТЕТ • НАЛАДКА В СМЕНУ";
+                } else {
+                    critBadge.className = "px-2.5 py-0.5 rounded bg-amber-500 text-white font-mono text-xs font-bold uppercase";
+                    critBadge.textContent = "КОРРЕКЦИЯ ТЕХПРОЦЕССА ЛИТЬЯ";
+                }
+            }
+
+            if (subtitle) {
+                subtitle.textContent = `Сводный регламент объединяет ${selectedItems.length} выбранных проблем(ы): ${selectedItems.map(i => `(#${i.id}) ${i.title}`).join(" + ")}.`;
+            }
+
+            // Агрегация уникальных правил ТБ (LOTO) и инструментов
+            const allSafety = [
+                "Стандарт LOTO ООО «Дельфин Групп»: перед работами в зоне смыкания пресс-формы, КРМ или гидростанции перевести ТПА в ручной режим, выключить двигатель гидронасоса, сбросить давление гидроаккумуляторов до 0 бар и установить механический упор."
+            ];
+            const allTools = new Set();
+            const allSteps = [];
+            const allParams = [];
+
+            selectedItems.forEach(item => {
+                item.safety.forEach(s => {
+                    if (!allSafety.includes(s)) allSafety.push(s);
+                });
+                item.tools.forEach(t => allTools.add(t));
+                item.steps.forEach((st, idx) => {
+                    allSteps.push({
+                        stepKey: `p${item.id}_s${idx}`,
+                        problemId: item.id,
+                        problemCode: item.code,
+                        problemTitle: item.title,
+                        title: st.title,
+                        detail: st.detail
+                    });
+                });
+                item.params.forEach(pr => {
+                    allParams.push({
+                        problemId: item.id,
+                        param: pr.param,
+                        norm: pr.norm,
+                        action: pr.action
+                    });
+                });
+            });
+
+            // Подсчёт прогресса выполненных шагов
+            const totalSteps = allSteps.length;
+            const doneSteps = allSteps.filter(s => completedStepsState[s.stepKey]).length;
+            const progressPercent = totalSteps > 0 ? Math.round((doneSteps / totalSteps) * 100) : 0;
+
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <!-- 1. Обязательные меры техники безопасности (LOTO / Сброс давления / Нагрев) -->
+                    <div class="bg-red-50 border-2 border-red-300 rounded-xl p-5 shadow-sm">
+                        <div class="flex items-start gap-3.5">
+                            <div class="w-10 h-10 rounded-lg bg-signal-red text-white flex items-center justify-center shrink-0 font-mono font-bold text-lg">
+                                !
+                            </div>
+                            <div class="space-y-2 flex-1">
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <h3 class="text-base sm:text-lg font-extrabold text-red-950 uppercase tracking-tight">
+                                        Обязательный допуск по технике безопасности (LOTO • Сброс давления • Отключение нагрева)
+                                    </h3>
+                                    <span class="font-mono text-xs font-bold px-2.5 py-0.5 rounded bg-signal-red text-white">ВЫПОЛНИТЬ ДО НАЧАЛА РАБОТ</span>
+                                </div>
+                                <ul class="space-y-1.5 text-xs sm:text-sm text-red-900 font-medium leading-snug">
+                                    ${allSafety.map(s => `
+                                        <li class="flex items-start gap-2">
+                                            <span class="font-bold text-signal-red">▪</span>
+                                            <span>${s}</span>
+                                        </li>
+                                    `).join("")}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Сводный список необходимого инструмента и приборов + Выбранные узлы -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                        <div class="lg:col-span-7 bg-slate-50 border-2 border-slate-300 rounded-xl p-5">
+                            <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-3">
+                                <h3 class="text-sm sm:text-base font-extrabold text-industrial-900 uppercase">
+                                    Необходимый инструмент и КИП для данного ремонта
+                                </h3>
+                                <span class="font-mono text-xs px-2 py-0.5 rounded bg-industrial-900 text-white">${allTools.size} поз.</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                ${Array.from(allTools).map(tool => `
+                                    <div class="flex items-start gap-2 bg-white p-2.5 rounded-lg border border-slate-200 text-xs sm:text-sm text-industrial-900 font-medium leading-snug">
+                                        <span class="text-signal-orange font-bold">🔧</span>
+                                        <span>${tool}</span>
+                                    </div>
+                                `).join("")}
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 bg-slate-50 border-2 border-slate-300 rounded-xl p-5 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-3">
+                                    <h3 class="text-sm sm:text-base font-extrabold text-industrial-900 uppercase">
+                                        Активные карточки в регламенте
+                                    </h3>
+                                    <span class="font-mono text-xs font-bold text-signal-orange">${selectedItems.length} выбрано</span>
+                                </div>
+                                <div class="space-y-2">
+                                    ${selectedItems.map(item => `
+                                        <div class="flex items-center justify-between gap-2 bg-white p-2.5 rounded-lg border border-slate-200 text-xs sm:text-sm">
+                                            <div>
+                                                <span class="font-mono font-bold text-signal-orange">#${item.id}</span>
+                                                <strong class="text-industrial-900 ml-1">${item.title}</strong>
+                                            </div>
+                                            <button type="button" data-action="toggle-problem" data-problem-id="${item.id}" class="no-print min-w-[36px] min-h-[36px] inline-flex items-center justify-center rounded-md text-slate-500 hover:text-red-700 hover:bg-red-50 font-mono text-sm cursor-pointer" title="Убрать из расчёта" aria-label="Убрать проблему ${item.id} из регламента">✕</button>
+                                        </div>
+                                    `).join("")}
+                                </div>
+                            </div>
+
+                            <!-- Прогресс-бар выполнения шагов -->
+                            <div class="mt-4 pt-3 border-t border-slate-200">
+                                <div class="flex items-center justify-between text-xs font-mono mb-1.5">
+                                    <span class="font-bold text-industrial-900">ВЫПОЛНЕНИЕ АЛГОРИТМА НАЛАДЧИКОМ:</span>
+                                    <span class="font-extrabold text-emerald-700">${doneSteps} из ${totalSteps} шагов (${progressPercent}%)</span>
+                                </div>
+                                <div class="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-signal-green transition-all duration-300" style="width: ${progressPercent}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Пошаговый алгоритм действий (Шаг 1, Шаг 2, Шаг 3... с интерактивными галочками) -->
+                    <div class="bg-white border-2 border-slate-300 rounded-xl p-5 sm:p-6 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-4">
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-extrabold text-industrial-900">
+                                    Пошаговый алгоритм устранения неисправностей (Интерактивный чек-лист)
+                                </h3>
+                                <p class="text-xs sm:text-sm text-slate-600">
+                                    Отмечайте галочками каждый выполненный шаг непосредственно у станка ТПА
+                                </p>
+                            </div>
+                            <div class="no-print flex items-center gap-2">
+                                <button type="button" data-action="mark-all-steps" data-state="true" class="text-xs font-mono font-bold px-3 py-1.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100 cursor-pointer">
+                                    Отметить все шаги
+                                </button>
+                                <button type="button" data-action="mark-all-steps" data-state="false" class="text-xs font-mono font-semibold px-3 py-1.5 rounded bg-slate-100 text-slate-600 border border-slate-300 hover:bg-slate-200 cursor-pointer">
+                                    Снять отметки
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="solution-steps" class="space-y-3">
+                            ${allSteps.map((step, index) => {
+                                const isDone = !!completedStepsState[step.stepKey];
+                                const isNewProblem = index === 0 || allSteps[index - 1].problemId !== step.problemId;
+                                return `
+                                    ${isNewProblem ? `
+                                        <div class="pt-3 border-t border-dashed border-slate-300 first:border-t-0">
+                                            <span class="font-mono text-xs font-extrabold uppercase px-2.5 py-1 rounded bg-industrial-900 text-orange-400">
+                                                Карточка #${step.problemId} — ${escapeHtml(step.problemTitle)}
+                                            </span>
+                                        </div>` : ""}
+                                    <label class="flex items-start gap-3.5 p-4 rounded-xl border-2 transition cursor-pointer ${isDone ? 'bg-emerald-50/50 border-emerald-400' : 'bg-slate-50/70 border-slate-200 hover:border-slate-300'}">
+                                        <input
+                                            type="checkbox"
+                                            ${isDone ? "checked" : ""}
+                                            data-step-key="${step.stepKey}"
+                                            class="step-check-input hmi-checkbox hmi-step-checkbox mt-0.5"
+                                            aria-label="Шаг ${index + 1}: ${escapeHtml(step.title)}"
+                                        >
+                                        <div class="flex-1 space-y-1">
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <span class="font-mono text-xs font-extrabold px-2 py-0.5 rounded ${isDone ? 'bg-emerald-700 text-white' : 'bg-industrial-900 text-orange-400'}">
+                                                    ШАГ ${index + 1}
+                                                </span>
+                                                <span class="font-mono text-xs text-slate-500 font-semibold">[Проблема #${step.problemId}]</span>
+                                            </div>
+                                            <div class="text-sm sm:text-base font-bold ${isDone ? 'line-through text-slate-500' : 'text-industrial-900'}">
+                                                ${step.title}
+                                            </div>
+                                            <p class="text-xs sm:text-sm ${isDone ? 'text-slate-400' : 'text-slate-700'} leading-relaxed">
+                                                ${step.detail}
+                                            </p>
+                                        </div>
+                                    </label>
+                                `;
+                            }).join("")}
+                        </div>
+                    </div>
+
+                    <!-- 4. Таблица нормативных технологических параметров для выбранных проблем -->
+                    <div class="bg-white border-2 border-slate-300 rounded-xl overflow-hidden shadow-sm">
+                        <div class="bg-industrial-800 text-white px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <h3 class="text-sm sm:text-base font-extrabold uppercase tracking-wide">
+                                Карта нормативных технологических параметров и допусков ТПА
+                            </h3>
+                            <span class="font-mono text-xs text-orange-300">Стандарт цеха ООО «Дельфин Групп»</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                                <thead>
+                                    <tr class="bg-slate-100 border-b border-slate-300 font-mono text-xs uppercase text-slate-600">
+                                        <th class="py-3 px-4">Узел / Проблема</th>
+                                        <th class="py-3 px-4">Контролируемый параметр</th>
+                                        <th class="py-3 px-4">Паспортная норма (ПП / ТПА)</th>
+                                        <th class="py-3 px-4">Регламентное действие наладчика</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200">
+                                    ${allParams.map(row => `
+                                        <tr class="hover:bg-slate-50">
+                                            <td class="py-3 px-4 font-mono font-bold text-signal-orange">#${row.problemId}</td>
+                                            <td class="py-3 px-4 font-semibold text-industrial-900">${row.param}</td>
+                                            <td class="py-3 px-4 font-mono font-bold text-signal-blue">${row.norm}</td>
+                                            <td class="py-3 px-4 text-slate-700">${row.action}</td>
+                                        </tr>
+                                    `).join("")}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Восстанавливаем фокус после перерисовки чекбокса шага
+            if (restoreStepFocusKey) {
+                const target = container.querySelector(`input[data-step-key="${restoreStepFocusKey}"]`);
+                if (target) target.focus();
+                restoreStepFocusKey = null;
+            }
+        }
+
+        /**
+         * Отметка выполнения конкретного шага инструкции
+         */
+        function toggleStepDone(stepKey) {
+            if (!stepKey) return;
+            completedStepsState[stepKey] = !completedStepsState[stepKey];
+            restoreStepFocusKey = stepKey;
+            persistState();
+            renderSolutionPanel();
+        }
+
+        /**
+         * Отметить или снять все шаги текущего решения
+         */
+        function markAllSteps(state) {
+            const selectedItems = PROBLEMS_DB.filter(p => selectedProblemIds.has(p.id));
+            selectedItems.forEach(item => {
+                item.steps.forEach((_, idx) => {
+                    completedStepsState[`p${item.id}_s${idx}`] = state;
+                });
+            });
+            persistState();
+            renderSolutionPanel();
+        }
+
+        /**
+         * Фильтрация по вкладкам категорий
+         */
+        function setCategoryFilter(category) {
+            activeCategory = category || "all";
+            const tabs = ["all", "classic", "hardware", "mold"];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (!btn) return;
+                if (t === activeCategory) {
+                    btn.className = "category-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold bg-industrial-900 text-white shadow-sm transition cursor-pointer";
+                    btn.setAttribute("aria-selected", "true");
+                } else {
+                    btn.className = "category-tab px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 transition cursor-pointer";
+                    btn.setAttribute("aria-selected", "false");
+                }
+            });
+            renderProblemsGrid();
+        }
+
+        /**
+         * Поиск по симптому или коду ошибки
+         */
+        function handleSearchInput(val) {
+            currentSearchQuery = val || "";
+            const clearBtn = document.getElementById("clearSearchBtn");
+            if (clearBtn) {
+                clearBtn.classList.toggle("hidden", currentSearchQuery.length === 0);
+            }
+            renderProblemsGrid();
+        }
+
+        function clearSearch() {
+            const input = document.getElementById("symptomSearch");
+            if (input) input.value = "";
+            handleSearchInput("");
+        }
+
+        /**
+         * Быстрые пресеты комбинаций ошибок
+         */
+        function loadPresetCombo(presetKey) {
+            completedStepsState = {};
+            if (presetKey === "thinwall") {
+                selectedProblemIds = new Set([1, 3, 4]);
+                setSelectValue("machineSelect", "ТПА №01 — Скоростной 280т (IML-контейнер)");
+                showToast("Выбран кейс: Скоростной ТПА тонкостенной тары (Проблемы #1, #3, #4)");
+            } else if (presetKey === "hydraulic") {
+                selectedProblemIds = new Set([5, 6, 7]);
+                setSelectValue("machineSelect", "ТПА №04 — Гидравлический 320т (Тара ПП)");
+                showToast("Выбран кейс: Гидравлический ТПА 120–500 т (Проблемы #5, #6, #7)");
+            } else if (presetKey === "shortshot_burn") {
+                selectedProblemIds = new Set([1, 4]);
+                showToast("Выбрана связка: Недолив изделия + Пригар («эффект дизеля»)");
+            } else if (presetKey === "flash_clamp") {
+                selectedProblemIds = new Set([2, 5]);
+                showToast("Выбрана связка: Облой по разъёму + Перекос плит КРМ");
+            } else if (presetKey === "screw_hyd") {
+                selectedProblemIds = new Set([6, 7]);
+                showToast("Выбрана связка: Нестабильная подушка шнека + Перегрев гидросистемы");
+            }
+            renderProblemsGrid();
+            renderSolutionPanel();
+            persistState();
+            const sol = document.getElementById("solution");
+            if (sol) sol.scrollIntoView({ behavior: "smooth" });
+        }
+
+        function selectMachineQuick(machineName) {
+            if (!machineName) return;
+            setSelectValue("machineSelect", machineName);
+            updateMachineTagUI();
+            persistState();
+            const diag = document.getElementById("diagnostics");
+            if (diag) diag.scrollIntoView({ behavior: "smooth" });
+            showToast(`Выбран пост диагностики: ${machineName}`);
+        }
+
+        function setSelectValue(id, val) {
+            const el = document.getElementById(id);
+            if (el) el.value = val;
+        }
+
+        function updateMachineTagUI() {
+            const machineSelect = document.getElementById("machineSelect");
+            const tag = document.getElementById("solutionMachineTag");
+            if (machineSelect && tag) {
+                tag.textContent = machineSelect.value;
+            }
+        }
+
+        /**
+         * Сброс всех выбранных чекбоксов
+         */
+        function resetAllSelections() {
+            selectedProblemIds.clear();
+            completedStepsState = {};
+            persistState();
+            renderProblemsGrid();
+            renderSolutionPanel();
+            showToast("Выбор проблем сброшен");
+        }
+
+        /**
+         * Копирование сводной инструкции в буфер обмена (Clipboard API + fallback execCommand для iFrame)
+         */
+        async function copyInstructionToClipboard() {
+            const selectedItems = PROBLEMS_DB.filter(p => selectedProblemIds.has(p.id));
+            if (selectedItems.length === 0) {
+                showToast("Сначала отметьте хотя бы одну проблему для копирования инструкции");
+                return;
+            }
+
+            const machine = document.getElementById("machineSelect")?.value || "ТПА";
+            const shift = document.getElementById("shiftSelect")?.value || "Смена";
+
+            const lines = [];
+            lines.push(`=== РЕГЛАМЕНТ РЕМОНТА ТПА | ООО «ДЕЛЬФИН ГРУПП» ===`);
+            lines.push(`Станок: ${machine}`);
+            lines.push(`Смена: ${shift}`);
+            lines.push(`Выбранные проблемы (${selectedItems.length}):`);
+            selectedItems.forEach(item => {
+                lines.push(`- (#${item.id}) ${item.title} [${item.code}]`);
+            });
+            lines.push(``);
+            lines.push(`ПОШАГОВЫЙ АЛГОРИТМ ДЕЙСТВИЙ:`);
+
+            let stepNum = 1;
+            selectedItems.forEach(item => {
+                item.steps.forEach(st => {
+                    lines.push(`Шаг ${stepNum++} (#${item.id}): ${st.title} — ${st.detail}`);
+                });
+            });
+
+            lines.push(``);
+            lines.push(`Сервисная служба ООО «Дельфин Групп»: Санкт-Петербург, п. Металлострой, дорога на Металлострой, д. 5, лит. П | +7 (812) 464-87-12`);
+
+            const fullText = lines.join("\n");
+
+            try {
+                if (navigator.clipboard && typeof navigator.clipboard.writeText === "function" && window.isSecureContext) {
+                    await navigator.clipboard.writeText(fullText);
+                    showToast("Сводная инструкция скопирована в буфер обмена");
+                    return;
+                }
+            } catch (e) {
+                // переход к фолбэку ниже
+            }
+
+            const textArea = document.createElement("textarea");
+            textArea.value = fullText;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand("copy");
+                showToast("Сводная инструкция скопирована в буфер обмена");
+            } catch (err) {
+                showToast("Не удалось скопировать текст");
+            }
+            document.body.removeChild(textArea);
+        }
+
+        /**
+         * Печать сводного регламента (или сохранение в PDF)
+         */
+        function printInstruction() {
+            const selectedItems = PROBLEMS_DB.filter(p => selectedProblemIds.has(p.id));
+            if (selectedItems.length === 0) {
+                showToast("Сначала отметьте хотя бы одну проблему для печати регламента");
+                return;
+            }
+            window.print();
+        }
+
+        /**
+         * Работа со сменным журналом мастера (localStorage)
+         */
+        function loadLogsFromStorage() {
+            if (storageOk) {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY_LOGS);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (Array.isArray(parsed)) {
+                            shiftLogs = parsed;
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    // fallback
+                }
+            }
+            shiftLogs = JSON.parse(JSON.stringify(DEFAULT_SHIFT_LOGS));
+            saveLogsToStorage();
+        }
+
+        function saveLogsToStorage() {
+            if (!storageOk) return;
+            try {
+                localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(shiftLogs));
+            } catch (e) {
+                // игнорируем переполнение квоты
+            }
+        }
+
+        function saveCurrentRepairToLog() {
+            const selectedItems = PROBLEMS_DB.filter(p => selectedProblemIds.has(p.id));
+            if (selectedItems.length === 0) {
+                showToast("Отметьте хотя бы одну ошибку ТПА перед записью в журнал смены");
+                return;
+            }
+
+            const machine = document.getElementById("machineSelect")?.value || "ТПА №01";
+            const shift = document.getElementById("shiftSelect")?.value || "Смена А";
+
+            let totalSteps = 0;
+            let doneSteps = 0;
+            selectedItems.forEach(item => {
+                item.steps.forEach((_, idx) => {
+                    totalSteps++;
+                    if (completedStepsState[`p${item.id}_s${idx}`]) doneSteps++;
+                });
+            });
+
+            const now = new Date();
+            const timeStr = `Сегодня, ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
+            const newEntry = {
+                id: "LOG-" + Math.floor(100 + Math.random() * 900),
+                time: timeStr,
+                shift: shift,
+                machine: machine,
+                problemIds: selectedItems.map(i => i.id),
+                problemTitles: selectedItems.map(i => `(${i.id}) ${i.title}`),
+                stepsProgress: `${doneSteps} / ${totalSteps} шагов`,
+                status: doneSteps === totalSteps && totalSteps > 0 ? "Устранено" : "В работе"
+            };
+
+            shiftLogs.unshift(newEntry);
+            saveLogsToStorage();
+            persistState();
+            renderShiftLogTable();
+            updateShopHeaderStatus();
+            showToast(`Запись добавлена в сменный журнал (${machine})`);
+
+            const logSection = document.getElementById("shift-log");
+            if (logSection) logSection.scrollIntoView({ behavior: "smooth" });
+        }
+
+        function renderShiftLogTable() {
+            const tbody = document.getElementById("shiftLogTableBody");
+            if (!tbody) return;
+
+            if (shiftLogs.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-8 px-4 text-center text-slate-500">
+                            Журнал смены пуст. Нажмите «Сохранить ремонт в журнал смены» в блоке инструкции или восстановите демо-записи.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = shiftLogs.map((log, idx) => {
+                const statusClass = log.status === "Устранено"
+                    ? "bg-emerald-100 text-signal-green border-emerald-300"
+                    : log.status === "Передано в ИУ"
+                        ? "bg-blue-100 text-signal-blue border-blue-300"
+                        : "bg-orange-100 text-signal-orange border-orange-300";
+
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="py-3.5 px-4 align-top">
+                            <div class="font-mono font-bold text-industrial-900">${escapeHtml(log.time)}</div>
+                            <div class="text-xs text-slate-500">${escapeHtml(log.shift)}</div>
+                            <!-- Отображение станка на мобильных устройствах (< md) -->
+                            <div class="font-bold text-signal-orange text-xs md:hidden mt-1">${escapeHtml(log.machine)}</div>
+                        </td>
+                        <td class="py-3.5 px-4 align-top font-bold text-industrial-900 hidden md:table-cell">
+                            ${escapeHtml(log.machine)}
+                        </td>
+                        <td class="py-3.5 px-4 align-top">
+                            <div class="flex flex-wrap gap-1.5">
+                                ${log.problemTitles.map(t => `
+                                    <span class="inline-block text-xs font-medium px-2 py-0.5 rounded bg-slate-100 border border-slate-300 text-industrial-900">
+                                        ${escapeHtml(t)}
+                                    </span>
+                                `).join("")}
+                            </div>
+                        </td>
+                        <td class="py-3.5 px-4 align-top font-mono text-xs font-bold text-slate-700 hidden lg:table-cell">
+                            ${escapeHtml(log.stepsProgress)}
+                        </td>
+                        <td class="py-3.5 px-4 align-top">
+                            <button type="button" data-action="cycle-log-status" data-log-index="${idx}" class="font-mono text-xs font-bold px-2.5 py-1.5 rounded border ${statusClass} cursor-pointer" title="Нажмите для смены статуса">
+                                ${escapeHtml(log.status)} ↻
+                            </button>
+                        </td>
+                        <td class="py-3.5 px-4 align-top text-right whitespace-nowrap">
+                            <div class="inline-flex items-center justify-end gap-1.5">
+                                <button type="button" data-action="restore-from-log" data-log-index="${idx}" class="text-xs font-bold text-signal-blue hover:underline px-2 py-1.5 cursor-pointer">
+                                    Открыть в регламенте
+                                </button>
+                                <button type="button" data-action="delete-log-row" data-log-index="${idx}" class="min-w-[36px] min-h-[36px] inline-flex items-center justify-center rounded-md text-xs font-semibold text-slate-500 hover:text-red-700 hover:bg-red-50 cursor-pointer" title="Удалить запись" aria-label="Удалить запись из журнала">
+                                    ✕
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+        function cycleLogStatus(index) {
+            const idx = Number(index);
+            if (Number.isNaN(idx) || !shiftLogs[idx]) return;
+            const order = ["В работе", "Устранено", "Передано в ИУ"];
+            const current = shiftLogs[idx].status || "В работе";
+            const next = order[(order.indexOf(current) + 1) % order.length];
+            shiftLogs[idx].status = next;
+            saveLogsToStorage();
+            renderShiftLogTable();
+            updateShopHeaderStatus();
+            showToast(`Статус записи изменён на «${next}»`);
+        }
+
+        function restoreSelectionFromLog(index) {
+            const idx = Number(index);
+            const entry = shiftLogs[idx];
+            if (!entry) return;
+            selectedProblemIds = new Set(entry.problemIds && entry.problemIds.length ? entry.problemIds : [1]);
+            setSelectValue("machineSelect", entry.machine);
+            persistState();
+            renderProblemsGrid();
+            renderSolutionPanel();
+            const sol = document.getElementById("solution");
+            if (sol) sol.scrollIntoView({ behavior: "smooth" });
+            showToast(`Загружен регламент для записи: ${entry.machine}`);
+        }
+
+        function deleteLogRow(index) {
+            const idx = Number(index);
+            if (Number.isNaN(idx) || !shiftLogs[idx]) return;
+            lastLogsBackup = JSON.parse(JSON.stringify(shiftLogs));
+            const removed = shiftLogs.splice(idx, 1)[0];
+            saveLogsToStorage();
+            renderShiftLogTable();
+            updateShopHeaderStatus();
+            showToast(`Запись «${removed.machine}» удалена из журнала`, true);
+        }
+
+        function resetDemoShiftLog() {
+            lastLogsBackup = JSON.parse(JSON.stringify(shiftLogs));
+            shiftLogs = JSON.parse(JSON.stringify(DEFAULT_SHIFT_LOGS));
+            saveLogsToStorage();
+            renderShiftLogTable();
+            updateShopHeaderStatus();
+            showToast("Демонстрационные записи сменного журнала восстановлены", true);
+        }
+
+        function undoLastLogChange() {
+            if (!lastLogsBackup) return;
+            shiftLogs = lastLogsBackup;
+            lastLogsBackup = null;
+            saveLogsToStorage();
+            renderShiftLogTable();
+            updateShopHeaderStatus();
+            showToast("Изменение сменного журнала отменено");
+        }
+
+        /**
+         * Модальное окно вызова дежурного наладчика / заявки на ремонт
+         */
+        let modalLastFocused = null;
+
+        function openCallModal(requestType) {
+            const modal = document.getElementById("serviceModal");
+            const title = document.getElementById("modalTitle");
+            const typeInput = document.getElementById("modalRequestType");
+            const machineInput = document.getElementById("modalMachineInput");
+            const symptomsInput = document.getElementById("modalSymptomsText");
+
+            const currentMachine = document.getElementById("machineSelect")?.value || "ТПА №01 — Скоростной 280т";
+            const selectedItems = PROBLEMS_DB.filter(p => selectedProblemIds.has(p.id));
+
+            if (title) title.textContent = requestType;
+            if (typeInput) typeInput.value = requestType;
+            if (machineInput) machineInput.value = currentMachine;
+
+            if (symptomsInput) {
+                if (selectedItems.length > 0) {
+                    symptomsInput.value = `Выявлены проблемы: ${selectedItems.map(i => `(#${i.id}) ${i.title}`).join("; ")}. Требуется выход специалиста к станку.`;
+                } else {
+                    symptomsInput.value = "Требуется оперативный осмотр узла смыкания / пресс-формы дежурным наладчиком.";
+                }
+            }
+
+            if (modal) {
+                modal.classList.remove("hidden");
+                modalLastFocused = document.activeElement;
+                const nameInput = document.getElementById("modalMasterName");
+                if (nameInput) setTimeout(() => nameInput.focus(), 50);
+            }
+        }
+
+        function closeCallModal() {
+            const modal = document.getElementById("serviceModal");
+            if (!modal) return;
+            modal.classList.add("hidden");
+            if (modalLastFocused && typeof modalLastFocused.focus === "function") {
+                modalLastFocused.focus();
+            }
+            modalLastFocused = null;
+        }
+
+        function submitServiceRequest(event) {
+            event.preventDefault();
+            const reqType = document.getElementById("modalRequestType")?.value || "Вызов наладчика";
+            const machine = document.getElementById("modalMachineInput")?.value || "ТПА №01";
+            const master = document.getElementById("modalMasterName")?.value || "Дежурный мастер";
+            const comment = document.getElementById("modalSymptomsText")?.value || "";
+
+            const now = new Date();
+            const timeStr = `Сегодня, ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
+            shiftLogs.unshift({
+                id: "REQ-" + Math.floor(100 + Math.random() * 900),
+                time: timeStr,
+                shift: master,
+                machine: machine,
+                problemIds: Array.from(selectedProblemIds),
+                problemTitles: [reqType, comment.slice(0, 75) + (comment.length > 75 ? "..." : "")],
+                stepsProgress: "Заявка в сервис",
+                status: "В работе"
+            });
+
+            saveLogsToStorage();
+            renderShiftLogTable();
+            updateShopHeaderStatus();
+            closeCallModal();
+            showToast(`Заявка «${reqType}» отправлена и зафиксирована в сменном журнале`);
+        }
+
+        /**
+         * Мобильное меню
+         */
+        function toggleMobileMenu(forceClose = false) {
+            const menu = document.getElementById("mobileMenu");
+            const btn = document.getElementById("mobileMenuBtn");
+            if (!menu) return;
+            const isHidden = forceClose ? (menu.classList.add("hidden"), true) : menu.classList.toggle("hidden");
+            if (btn) btn.setAttribute("aria-expanded", String(!isHidden));
+        }
+
+        /**
+         * Неблокирующее системное уведомление (Toast с опциональной кнопкой «Отменить»)
+         */
+        let toastTimer = null;
+        function showToast(message, showUndo = false) {
+            const toast = document.getElementById("hmiToast");
+            const text = document.getElementById("hmiToastText");
+            const undoBtn = document.getElementById("hmiToastUndoBtn");
+            if (!toast || !text) return;
+            text.textContent = message;
+            if (undoBtn) {
+                undoBtn.classList.toggle("hidden", !showUndo);
+            }
+            toast.classList.remove("hidden");
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.add("hidden");
+            }, showUndo ? 5500 : 3400);
+        }
+
+        /**
+         * Экранирование HTML для безопасного вывода
+         */
+        function escapeHtml(str) {
+            return String(str || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        /**
+         * Подсветка активного раздела навигации при прокрутке
+         */
+        function initScrollSpy() {
+            if (!("IntersectionObserver" in window)) return;
+            const sections = document.querySelectorAll("section[id]");
+            const navLinks = document.querySelectorAll(".nav-section-link");
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    const id = entry.target.getAttribute("id");
+                    navLinks.forEach(link => {
+                        const match = link.getAttribute("data-nav-link") === id;
+                        link.classList.toggle("bg-industrial-800", match);
+                        link.classList.toggle("text-orange-400", match);
+                    });
+                });
+            }, { rootMargin: "-25% 0px -65% 0px" });
+
+            sections.forEach(sec => observer.observe(sec));
+        }
+
+        /**
+         * Инициализация и единое делегирование событий (addEventListener)
+         */
+        window.addEventListener("DOMContentLoaded", () => {
+            loadStateFromStorage();
+            loadLogsFromStorage();
+            syncDailyChecklistDOM();
+            renderProblemsGrid();
+            renderSolutionPanel();
+            renderShiftLogTable();
+            initScrollSpy();
+
+            if (!storageOk) {
+                showToast("Автосохранение недоступно: журнал и выбор будут работать только в текущей сессии");
+            }
+
+            // Единое делегирование кликов по data-action на всём документе
+            document.addEventListener("click", (e) => {
+                const actionEl = e.target.closest("[data-action]");
+                if (!actionEl) return;
+
+                const action = actionEl.dataset.action;
+                switch (action) {
+                    case "toggle-problem":
+                        toggleProblemSelection(actionEl.dataset.problemId);
+                        break;
+                    case "select-from-unit":
+                        toggleProblemFromUnit(actionEl.dataset.problemId);
+                        break;
+                    case "load-preset":
+                        loadPresetCombo(actionEl.dataset.preset);
+                        break;
+                    case "select-machine-quick":
+                        selectMachineQuick(actionEl.dataset.machine);
+                        break;
+                    case "filter-category":
+                        setCategoryFilter(actionEl.dataset.category);
+                        break;
+                    case "reset-filters":
+                        clearSearch();
+                        setCategoryFilter("all");
+                        break;
+                    case "clear-search":
+                        clearSearch();
+                        break;
+                    case "reset-selections":
+                        resetAllSelections();
+                        break;
+                    case "mark-all-steps":
+                        markAllSteps(actionEl.dataset.state === "true");
+                        break;
+                    case "copy-instruction":
+                        copyInstructionToClipboard();
+                        break;
+                    case "print-instruction":
+                        printInstruction();
+                        break;
+                    case "save-to-log":
+                        saveCurrentRepairToLog();
+                        break;
+                    case "cycle-log-status":
+                        cycleLogStatus(actionEl.dataset.logIndex);
+                        break;
+                    case "restore-from-log":
+                        restoreSelectionFromLog(actionEl.dataset.logIndex);
+                        break;
+                    case "delete-log-row":
+                        deleteLogRow(actionEl.dataset.logIndex);
+                        break;
+                    case "reset-demo-logs":
+                        resetDemoShiftLog();
+                        break;
+                    case "undo-log-change":
+                        undoLastLogChange();
+                        break;
+                    case "reset-daily-checklist":
+                        resetDailyChecklist();
+                        break;
+                    case "open-modal":
+                        openCallModal(actionEl.dataset.modalType || "Вызов дежурного наладчика ТПА");
+                        break;
+                    case "close-modal":
+                        closeCallModal();
+                        break;
+                    case "toggle-mobile-menu":
+                        toggleMobileMenu(false);
+                        break;
+                    case "close-mobile-menu":
+                        toggleMobileMenu(true);
+                        break;
+                }
+            });
+
+            // Делегирование изменений чекбоксов шагов и ежесменного осмотра
+            document.addEventListener("change", (e) => {
+                const target = e.target;
+                if (!target) return;
+
+                if (target.matches("input[data-step-key]")) {
+                    toggleStepDone(target.dataset.stepKey);
+                } else if (target.matches(".daily-check")) {
+                    updateDailyChecklistFromDOM();
+                } else if (target.id === "machineSelect") {
+                    updateMachineTagUI();
+                    persistState();
+                } else if (target.id === "shiftSelect") {
+                    persistState();
+                }
+            });
+
+            // Поиск по симптомам
+            const searchInput = document.getElementById("symptomSearch");
+            if (searchInput) {
+                searchInput.addEventListener("input", (e) => {
+                    handleSearchInput(e.target.value);
+                });
+            }
+
+            // Отправка формы сервисной заявки
+            const serviceForm = document.getElementById("serviceRequestForm");
+            if (serviceForm) {
+                serviceForm.addEventListener("submit", submitServiceRequest);
+            }
+
+            // Клавиатурная доступность карточек с role="button" и role="checkbox"
+            document.addEventListener("keydown", (e) => {
+                if (e.key !== "Enter" && e.key !== " ") return;
+                const interactiveCard = e.target.closest('[role="checkbox"][data-action], [role="button"][data-action]');
+                if (interactiveCard && e.target === interactiveCard) {
+                    e.preventDefault();
+                    interactiveCard.click();
+                }
+            });
+
+            // Закрытие модального окна по клику на фон, Escape и удержание фокуса (Focus Trap)
+            const serviceModalEl = document.getElementById("serviceModal");
+            if (serviceModalEl) {
+                serviceModalEl.addEventListener("click", (e) => {
+                    if (e.target === serviceModalEl) closeCallModal();
+                });
+                serviceModalEl.addEventListener("keydown", (e) => {
+                    if (e.key === "Escape") {
+                        e.preventDefault();
+                        closeCallModal();
+                        return;
+                    }
+                    if (e.key !== "Tab" || serviceModalEl.classList.contains("hidden")) return;
+                    const focusables = serviceModalEl.querySelectorAll("button:not([disabled]), input:not([readonly]), textarea, select, a[href]");
+                    if (!focusables.length) return;
+                    const first = focusables[0];
+                    const last = focusables[focusables.length - 1];
+                    if (e.shiftKey && document.activeElement === first) {
+                        e.preventDefault();
+                        last.focus();
+                    } else if (!e.shiftKey && document.activeElement === last) {
+                        e.preventDefault();
+                        first.focus();
+                    }
+                });
+            }
+
+            // Синхронизация между вкладками браузера
+            window.addEventListener("storage", (e) => {
+                if (e.key === STORAGE_KEY_STATE) {
+                    loadStateFromStorage();
+                    syncDailyChecklistDOM();
+                }
+                if (e.key === STORAGE_KEY_LOGS) {
+                    loadLogsFromStorage();
+                }
+                renderProblemsGrid();
+                renderSolutionPanel();
+                renderShiftLogTable();
+            });
+        });
+    </script>
+</body>
+</html>
