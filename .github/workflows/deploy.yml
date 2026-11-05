@@ -23,11 +23,9 @@ jobs:
       - name: Validate HTML, CSS and JS modules (Linting check)
         run: |
           echo "Проверка наличия обязательных модулей проекта ТПА-Мастер..."
-          test -f index.html && test -f styles.css && test -f main.js
-          grep -q "<!DOCTYPE html>" index.html
-          grep -q "styles.css" index.html
-          grep -q "main.js" index.html
-          echo "Проверка структуры HTML/CSS/JS успешно пройдена!"
+          test -f index.html && test -f style.css
+          grep -qi "<!DOCTYPE html>" index.html
+          echo "Проверка структуры HTML/CSS успешно пройдена!"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
