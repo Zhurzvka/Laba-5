@@ -1,6 +1,6 @@
 # ТПА-Мастер: Дельфин Групп (Лабораторная работа № 6 — CI/CD)
 
-[https://github.com/Zhurzvka/Laba-5/actions/workflows/deploy.yml/badge.svg]
+<img src="https://github.com/Zhurzvka/Laba-5/actions/workflows/deploy.yml/badge.svg" alt="Deploy static site">
 
 Инженерный веб-сервис интерактивной диагностики и регламента ремонта термопластавтоматов (ТПА) для литьевого цеха ООО «Дельфин Групп».
 
